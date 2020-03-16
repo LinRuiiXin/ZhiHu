@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/icon_index"
+        android:id="@+id/tab_index"
+        android:title="首页"
+        />
+    <item
+        android:icon="@drawable/icon_vip"
+        android:id="@+id/tab_vip"
+        android:title="会员"
+        />
+    <item
+        android:icon="@drawable/icon_add"
+        android:id="@+id/tab_add"
+        />
+    <item
+        android:icon="@drawable/icon_msg"
+        android:id="@+id/tab_msg"
+        android:title="消息"
+        />
+    <item
+        android:icon="@drawable/icon_mine"
+        android:id="@+id/tab_mine"
+        android:title="我的"
+        />
+</menu>
