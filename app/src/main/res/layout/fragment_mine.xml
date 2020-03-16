@@ -1,11 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#545"
+    android:background="#f6f6f6"
+    android:padding="10dp"
     >
-    <TextView
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/mine_line1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
+        <EditText
+            android:layout_width="280dp"
+            android:layout_height="35dp"
+            android:id="@+id/mine_search"
+            android:background="@drawable/search_shape"
+            android:layout_centerVertical="true"
+            android:paddingLeft="55dp"
+            android:textColor="#000"
+            android:textSize="14dp"
+            android:singleLine="true"
+            android:hint="搜索ZhiHu内容"
+            android:textColorHint="#9A9A9A"
+            />
+        <TextView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/icon_search"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            />
+        <TextView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/mine_scan"
+            android:background="@drawable/icon_scan"
+            android:layout_toRightOf="@+id/mine_search"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            />
+        <TextView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:id="@+id/mine_setting"
+            android:background="@drawable/icon_setting"
+            android:layout_toRightOf="@+id/mine_scan"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            />
+    </RelativeLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="mine"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:id="@+id/mine_card"
+        android:background="@drawable/mine_card_shape"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/mine_line1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
+
+    </FrameLayout>
+</RelativeLayout>

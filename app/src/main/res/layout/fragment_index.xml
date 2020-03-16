@@ -28,6 +28,7 @@
                 android:textColor="#000"
                 android:textSize="14dp"
                 android:singleLine="true"
+                android:textColorHint="#9A9A9A"
                 />
             <TextView
                 android:layout_width="25dp"

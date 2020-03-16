@@ -22,7 +22,7 @@ import com.sz.zhihu.utils.ArrayUtils;
 import com.sz.zhihu.utils.PermissionUtils;
 import com.sz.zhihu.utils.SystemUtils;
 /*
-* 主活动，控制应用四个模块的跳转
+* 主活动，控制应用五个模块的跳转
 * */
 public class MainActivity extends AppCompatActivity {
 
