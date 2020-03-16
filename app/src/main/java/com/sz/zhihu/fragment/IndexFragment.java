@@ -23,7 +23,9 @@ import com.sz.zhihu.interfaces.CustomFragmentFunction;
 import com.sz.zhihu.fragment.index.CareFragment;
 import com.sz.zhihu.fragment.index.HotFragment;
 import com.sz.zhihu.fragment.index.RecommendFragment;
-
+/*
+* 主页
+* */
 public class IndexFragment extends Fragment implements CustomFragmentFunction {
     View indexView = null;
     Context context;
@@ -38,7 +40,6 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
         super.onAttach(context);
         this.context = context;
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
                 }
 
             });
-            viewPager.setCurrentItem(1,false);
+            viewPager.setCurrentItem(1,false);//默认打开首页---推荐
             strip = view.findViewById(R.id.index_pagerTabStrip);
             strip.setShouldExpand(true);
             strip.setViewPager(viewPager);

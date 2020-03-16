@@ -6,7 +6,9 @@ import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-
+/*
+* 状态栏透明效果
+* */
 public class SystemUtils {
     public static void setStatusBarFullTransparent(Activity activity) {
         if (Build.VERSION.SDK_INT >= 21) {//21表示5.0

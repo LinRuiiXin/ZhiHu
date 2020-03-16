@@ -1,16 +1,19 @@
 package com.sz.zhihu.pojo;
-
+/*
+* 首页---推荐
+*   记录每个卡片的信息
+* */
 public class CardViewBean {
-    private Long contentId;
-    private Long userId;
-    private int contentType; //1-Answer 2.Artical
-    private int type;//1-all text 2-has image 3-has video
-    private String title;
-    private String username;
-    private String introduction;
-    private String content;
-    private Long supportSum;
-    private Long commentSum;
+    private Long contentId;//内容id，用contentType区分文章、回答
+    private Long userId;//用户id
+    private int contentType; //1-回答 2.文章
+    private int type;//1-纯文本 2-带图片 3-带视频
+    private String title;//标题
+    private String username;//用户名
+    private String introduction;//个人简介
+    private String content;//内容
+    private Long supportSum;//点赞数
+    private Long commentSum;//评论数
 
 
     public CardViewBean(Long contentId, Long userId, int contentType, int type, String title, String username, String introduction, String content, Long supportSum, Long commentSum) {

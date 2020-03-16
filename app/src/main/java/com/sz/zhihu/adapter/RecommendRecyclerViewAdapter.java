@@ -17,7 +17,10 @@ import com.sz.zhihu.R;
 import com.sz.zhihu.pojo.CardViewBean;
 
 import java.util.List;
-
+/*
+* RecommendRecyclerView适配器
+* 负责渲染CardViewBean，传入CardViewBean的集合，就可以按照类型(纯文本，带图，带视频)将数据按照合适的布局显示
+* */
 public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
     private Context context;
     private List<CardViewBean> data;

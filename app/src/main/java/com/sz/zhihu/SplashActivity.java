@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.sz.zhihu.utils.SystemUtils;
-
+/*
+* 启动页
+* */
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -17,6 +19,7 @@ public class SplashActivity extends AppCompatActivity {
         new Thread(()->{
             Intent intent = new Intent(SplashActivity.this,MainActivity.class);
             try {
+                //后期删除
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();

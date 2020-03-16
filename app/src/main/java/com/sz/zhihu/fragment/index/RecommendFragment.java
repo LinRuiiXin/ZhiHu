@@ -30,6 +30,7 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     private SwipeRefreshLayout swipeRefreshLayout;
     private Context context;
     private Handler handler = new Handler(){
+        //刷新，UI线程
         @Override
         public void handleMessage(@NonNull Message msg) {
             swipeRefreshLayout.setRefreshing(false);
@@ -61,13 +62,20 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
         }
         return view;
     }
-
+    /*
+    * 屏幕移动到最上面，并进行刷新操作
+    * 点击首页时被调用，前提是当前在首页---推荐
+    * ---------未完善-------------
+    * */
     @Override
     public void refreshPage() {
         swipeRefreshLayout.setRefreshing(true);
         handler.sendEmptyMessageDelayed(111,3000);
     }
-
+    /*
+    * 下拉刷新
+    * ---------未完善-------------
+    * */
     public SwipeRefreshLayout.OnRefreshListener onRefreshListener(){
         return ()->{
             handler.sendEmptyMessageDelayed(0,3000);
