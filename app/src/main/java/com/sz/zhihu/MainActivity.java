@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     * 初始化5个分类fragment
     * */
     private void initFragment() {
-        indexFragment = new IndexFragment(this);
+        indexFragment = new IndexFragment();
         vipFragment = new VipFragment();
         addFragment = new AddFragment();
         msgFragment = new MsgFragment();

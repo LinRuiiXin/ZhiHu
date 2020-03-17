@@ -36,10 +36,12 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
     private RecommendFragment recommendFragment;
     private HotFragment hotFragment;
 
-    public IndexFragment(@NonNull Context context) {
+    @Override
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

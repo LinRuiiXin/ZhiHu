@@ -18,12 +18,6 @@ public class SplashActivity extends AppCompatActivity {
         SystemUtils.setStatusBarFullTransparent(this);
         new Thread(()->{
             Intent intent = new Intent(SplashActivity.this,MainActivity.class);
-            try {
-                //后期删除
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             startActivity(intent);
         }).start();
     }
