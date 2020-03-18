@@ -9,7 +9,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:id="@+id/login_top_bar_close"
-        android:background="@drawable/icon_close"
+        android:background="@drawable/icon_close_activity"
         android:layout_centerVertical="true"
         />
     <TextView

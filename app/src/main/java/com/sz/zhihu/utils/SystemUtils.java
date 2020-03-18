@@ -1,11 +1,14 @@
 package com.sz.zhihu.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+
 /*
 * 状态栏透明效果
 * */
@@ -38,4 +41,5 @@ public class SystemUtils {
             window.getDecorView().setSystemUiVisibility(option);
         }
     }
+
 }

@@ -38,6 +38,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.astuetz:pagerslidingtabstrip:1.0.1'
     implementation 'de.gerdi-project:GSON:6.0.6'
-    /*implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'*/
+//    implementation 'com.github.sendtion:XRichText:1.9.4'
+//    implementation 'com.github.yuruiyin:RichEditor:0.1.0'
 }

@@ -15,6 +15,7 @@
         android:textSize="17dp"
         android:layout_margin="7dp"
         android:maxLines="2"
+        android:textColor="#000"
         />
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,7 +53,6 @@
                     android:id="@+id/answer_has_image_introduction"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
-                    android:textColor="#000"
 
                     />
             </LinearLayout>

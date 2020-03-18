@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/login_om_title"
-        android:text="登录ZhiHu体验更多功能"
+        android:text="登录ZhiHu，体验更多功能"
         android:textColor="#000"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
