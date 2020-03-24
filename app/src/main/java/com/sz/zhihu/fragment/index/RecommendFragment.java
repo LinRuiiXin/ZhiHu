@@ -19,7 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.sz.zhihu.R;
 import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
-import com.sz.zhihu.pojo.CardViewBean;
+import com.sz.zhihu.vo.CardViewBean;
 
 import java.util.ArrayList;
 import java.util.List;

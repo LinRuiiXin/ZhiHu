@@ -10,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionUtils {
+    public static final int REQUEST_CODE = 5;
     /*
     * 申请权限
     * @activity:当前活动
     * @permissions:要申请的权限数组
+    * @return: true---没有要申请的权限，false有要申请的权限
     * */
-    public static void registerPerMission(Activity activity, String...permissions){
+    public static boolean registerPerMission(Activity activity, String...permissions){
         List<String> permissionNeedToRegister = null;
         for(String permission:permissions){
             if(ContextCompat.checkSelfPermission(activity,permission) != PackageManager.PERMISSION_GRANTED){
@@ -26,7 +28,10 @@ public class PermissionUtils {
             }
         }
         if(permissionNeedToRegister != null){
-            ActivityCompat.requestPermissions(activity,permissionNeedToRegister.toArray(new String[permissionNeedToRegister.size()]),1);
+            ActivityCompat.requestPermissions(activity,permissionNeedToRegister.toArray(new String[permissionNeedToRegister.size()]),REQUEST_CODE);
+            return false;
+        }else{
+            return true;
         }
     }
 }

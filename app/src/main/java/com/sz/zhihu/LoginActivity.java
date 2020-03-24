@@ -1,27 +1,47 @@
 package com.sz.zhihu;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.sz.zhihu.dialog.MailLoginDialog;
+import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomEditTextListener;
+import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DiaLogUtils;
 import com.sz.zhihu.utils.RegexUtils;
+import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
+import com.sz.zhihu.utils.ValidateUtil;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class LoginActivity extends AppCompatActivity {
 
     private TextView changeText;
     private EditText mail;
     private EditText password;
     private Button login;
-    private TextView textView;
+    private TextView findPassword;
     private TextView close;
+    private TextView register;
+    private String serverLocation;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +58,10 @@ public class LoginActivity extends AppCompatActivity {
         mail = findViewById(R.id.login_mp_mail);
         password = findViewById(R.id.login_mp_password);
         login = findViewById(R.id.login_mp_log);
-        textView = findViewById(R.id.login_mp_find_password);
+        findPassword = findViewById(R.id.login_mp_find_password);
+        register = findViewById(R.id.login_mp_register);
+        serverLocation = getResources().getString(R.string.server_location);
+        gson = new Gson();
         addListener();
     }
 
@@ -96,6 +119,40 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener((v)->{
             String mail = this.mail.getText().toString();
             String password = this.password.getText().toString();
+            if(ValidateUtil.validate(mail,ValidateUtil.mailRegex)){
+                if(ValidateUtil.validate(password,ValidateUtil.passwordRegex)){
+                    String url = serverLocation + "/Login/"+mail+"/"+password;
+                    RequestUtils.sendSimpleRequest(url, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            runOnUiThread(()-> Toast.makeText(LoginActivity.this,"请求失败",Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
+                            runOnUiThread(()->{
+                                if(simpleDto.isSuccess()){
+                                    User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                    user.save();
+                                    Intent intent = new Intent(LoginActivity.this,MainActivity.class);
+                                    startActivity(intent);
+                                }else{
+                                    Toast.makeText(LoginActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }else {
+                    Toast.makeText(this,"密码错误",Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                Toast.makeText(this,"请检查邮箱格式",Toast.LENGTH_SHORT).show();
+            }
+        });
+        register.setOnClickListener((v)->{
+            Intent intent = new Intent(this,RegisterActivity.class);
+            startActivity(intent);
         });
     }
 }

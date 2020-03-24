@@ -17,8 +17,13 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         SystemUtils.setStatusBarFullTransparent(this);
         new Thread(()->{
-            Intent intent = new Intent(SplashActivity.this,MainActivity.class);
-            startActivity(intent);
+            try {
+                Thread.sleep(1000);
+                Intent intent = new Intent(SplashActivity.this,MainActivity.class);
+                startActivity(intent);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }).start();
     }
 }

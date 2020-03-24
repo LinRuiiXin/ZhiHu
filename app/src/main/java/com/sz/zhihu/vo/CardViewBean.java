@@ -1,4 +1,4 @@
-package com.sz.zhihu.pojo;
+package com.sz.zhihu.vo;
 /*
 * 首页---推荐
 *   记录每个卡片的信息

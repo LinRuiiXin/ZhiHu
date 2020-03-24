@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sz.zhihu.R;
-import com.sz.zhihu.pojo.CardViewBean;
+import com.sz.zhihu.vo.CardViewBean;
 
 import java.util.List;
 /*

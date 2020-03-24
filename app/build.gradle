@@ -38,6 +38,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.astuetz:pagerslidingtabstrip:1.0.1'
     implementation 'de.gerdi-project:GSON:6.0.6'
-//    implementation 'com.github.sendtion:XRichText:1.9.4'
-//    implementation 'com.github.yuruiyin:RichEditor:0.1.0'
+    compile 'com.makeramen:roundedimageview:2.2.1'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.squareup.okio:okio:1.12.0'
+    // litepal数据库
+    compile 'org.litepal.android:core:1.6.1'
 }

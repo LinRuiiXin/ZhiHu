@@ -67,6 +67,7 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="40dp"
+            android:id="@+id/login_om_send_mail"
             android:layout_weight="1"
             android:text="获取验证码"
             android:textSize="10dp"
@@ -82,5 +83,17 @@
         android:layout_gravity="end"
         android:layout_marginRight="48dp"
         android:text="找回密码"
+        android:textSize="10dp"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/login_om_login"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="45dp"
+        android:layout_marginRight="45dp"
+        android:textColor="#fff"
+        android:background="@drawable/login_log_button_shape_enable"
+        android:text="登录"
         />
 </LinearLayout>

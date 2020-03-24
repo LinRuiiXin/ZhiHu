@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">ZhiHu</string>
-    <string name="server_location">192.168.137.1:8080</string>
+    <string name="server_location">http://192.168.137.1:8080/ZhiHu</string>
 </resources>

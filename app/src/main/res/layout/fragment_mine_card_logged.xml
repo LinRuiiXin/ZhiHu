@@ -3,40 +3,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="170dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/mine_card_shape"
-    android:orientation="vertical"
-    >
-    <LinearLayout
+    android:orientation="vertical">
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/mine_card_il_info"
         android:orientation="horizontal"
+        android:layout_marginTop="10dp"
         >
-        <ImageView
+        <com.makeramen.roundedimageview.RoundedImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:id="@+id/mine_card_il_portrait"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
+            android:src="@drawable/default_portrait"
+            app:riv_oval="true"
+            android:scaleType="centerCrop"
             />
+
         <TextView
+            android:id="@+id/mine_card_il_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/mine_card_il_username"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
-            android:textSize="22dp"
             android:textColor="#fff"
-            android:text="lsx"
+            android:textSize="22dp"
             android:textStyle="bold"
+            android:layout_toRightOf="@id/mine_card_il_portrait"
             />
 
         <LinearLayout
             android:id="@+id/mine_card_il_personal_page"
             android:layout_width="wrap_content"
             android:layout_height="23dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="150dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
             android:orientation="horizontal">
 
             <TextView
@@ -53,13 +59,11 @@
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/icon_right" />
         </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_below="@+id/mine_card_il_info"
-        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         >
         <RelativeLayout
