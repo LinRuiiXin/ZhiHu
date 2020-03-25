@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">ZhiHu</string>
     <string name="server_location">192.168.137.1:8080</string>
+    <string name="icons">&#xe64c; &#xe607; &#xe68c; &#xe61e; &#xe609; &#xe636; &#xe615; &#xe62a; &#xe798; &#xe60c; </string>
 </resources>

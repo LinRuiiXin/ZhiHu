@@ -1,12 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#532"
-    >
-    <TextView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:src="@drawable/icon_down"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/iv_down"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/ll_day"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/iv_down"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:padding="5dp">
+        <ImageView
+            android:src="@drawable/icon_mine"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="left"/>
+
+        <TextView
+            android:layout_width="216dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:text="今天是你加入知乎的第1天"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="add"
-        />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="70dp"
+        android:background="@drawable/shadow"
+        android:id="@+id/et_question"
+        android:layout_below="@id/ll_day"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="50dp">
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_icon_question"
+            android:src="@drawable/icon_question"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="70dp"
+            android:layout_toRightOf="@id/iv_icon_question"
+            android:layout_marginRight="35dp"
+            android:hint="提个问题"
+            android:background="@null"/>
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/et_question"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp">
+        <RelativeLayout
+            android:layout_width="115dp"
+            android:layout_height="150dp">
+            <ImageView
+                android:src="@drawable/icon_answer"
+                android:id="@+id/iv_answer_top"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="35dp"/>
+            <TextView
+                android:layout_below="@id/iv_answer_top"
+                android:id="@+id/tv_answer_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="回答问题"
+                android:textSize="20sp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="10dp"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="115dp"
+            android:layout_height="150dp">
+            <ImageView
+                android:src="@drawable/icon_movice"
+                android:id="@+id/iv_movice_top"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="35dp"/>
+            <TextView
+                android:layout_below="@id/iv_movice_top"
+                android:id="@+id/tv_movice_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="发视频"
+                android:textSize="20sp"
+                android:paddingLeft="20dp"
+                android:paddingRight="25dp"
+                android:paddingBottom="10dp"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="115dp"
+            android:layout_height="150dp">
+            <ImageView
+                android:src="@drawable/icon_actice"
+                android:id="@+id/iv_actice_top"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="35dp"/>
+            <TextView
+                android:layout_below="@id/iv_actice_top"
+                android:id="@+id/tv_actice_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="写文章"
+                android:textSize="20sp"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:paddingBottom="10dp"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+</RelativeLayout>
