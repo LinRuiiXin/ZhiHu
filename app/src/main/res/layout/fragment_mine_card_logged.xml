@@ -2,7 +2,7 @@
 <!--nl：not login,il:is login-->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="170dp"
+    android:layout_height="180dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/mine_card_shape"
     android:orientation="vertical">

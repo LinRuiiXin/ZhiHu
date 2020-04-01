@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".RecommendQuestionActivity">
+
+    <TextView
+        android:id="@+id/arq_close"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/icon_close_activity" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/arq_card"
+        android:layout_width="match_parent"
+        android:layout_height="570dp"
+        android:layout_below="@+id/arq_close"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="0dp"
+
+        android:layout_marginRight="30dp"/>
+
+    <Button
+        android:id="@+id/arq_write_answer"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/arq_add_answer_button_shape"
+        android:text="写回答"
+        android:textColor="@color/ZhiHuBlue" />
+</RelativeLayout>

@@ -19,7 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.sz.zhihu.R;
 import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
-import com.sz.zhihu.vo.CardViewBean;
+import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,15 +36,15 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
             swipeRefreshLayout.setRefreshing(false);
         }
     };
-    private List<CardViewBean> data;
+    private List<RecommendViewBean> data;
     public RecommendFragment(Context context){
         this.context = context;
-        data = new ArrayList<CardViewBean>();
+        data = new ArrayList<RecommendViewBean>();
         for(int i=0;i<10;i++){
-            data.add(new CardViewBean(1L,1L,1,1,"hello12","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-            data.add(new CardViewBean(1L,1L,1,1,"hello23","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-            data.add(new CardViewBean(1L,1L,1,3,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-            data.add(new CardViewBean(1L,1L,1,2,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
+            data.add(new RecommendViewBean(1L,1L,1,1,"你看过最细思恐极的图片是什么","林瑞鑫","知乎 官方账号","2个荷兰女孩结伴去巴拿马旅行，在雨林中失踪。三个月后尸体出现在河边，和残骸一起发现的还有",12344L,212134L));
+            data.add(new RecommendViewBean(1L,1L,1,1,"hello23","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
+            data.add(new RecommendViewBean(1L,1L,1,3,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
+            data.add(new RecommendViewBean(1L,1L,1,2,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
         }
     }
     @SuppressLint("ResourceAsColor")

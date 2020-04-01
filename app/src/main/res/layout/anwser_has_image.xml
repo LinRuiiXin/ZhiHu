@@ -62,6 +62,7 @@
                 android:id="@+id/answer_has_image_content"
                 android:maxLines="2"
                 android:layout_marginTop="10dp"
+                android:textColor="#000"
                 />
         </LinearLayout>
         <TextView

@@ -3,7 +3,7 @@
 <!--    数据库名-->
     <dbname value="litepaldemo" />
 <!--    版本-->
-    <version value="1" />
+    <version value="2" />
     <list>
         <mapping class="com.sz.zhihu.po.User"></mapping>
     </list>

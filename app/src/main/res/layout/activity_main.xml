@@ -18,6 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_tabs_menu"
         android:background="#fff"
+        app:itemTextColor="@color/ZhiHuBlue"
         >
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>

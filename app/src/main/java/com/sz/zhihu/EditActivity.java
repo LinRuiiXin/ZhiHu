@@ -2,6 +2,7 @@ package com.sz.zhihu;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
@@ -9,30 +10,39 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
+import android.text.Html;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.sz.zhihu.interfaces.CustomEditTextListener;
-import com.sz.zhihu.span.ImageCentreSpan;
+import com.google.gson.Gson;
+import com.rex.editor.view.RichEditorNew;
+import com.sz.zhihu.dto.SimpleDto;
+import com.sz.zhihu.po.Question;
+import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.ArrayUtils;
+import com.sz.zhihu.utils.FileUtils;
+import com.sz.zhihu.utils.HtmlUtils;
 import com.sz.zhihu.utils.PermissionUtils;
+import com.sz.zhihu.utils.RequestUtils;
+import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
+import com.sz.zhihu.utils.UserUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
 
 public class EditActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,21 +51,18 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     private Button bold;
     private Button italic;
     private Button title;
-    private Button reference;
+    private Button order;
     private Button photo;
     private Button video;
     private Button divider;
-    private EditText editText;
-    private int STATE_NOW = 1;
-    private final int STATE_DEFAULT = 1;
-    private final int STATE_BOLD = 2;
-    private final int STATE_ITALIC = 3;
-    private final int STATE_TITLE = 4;
-    private final int STATE_REFERENCE = 5;
-    private int index = -1;
+    private RichEditorNew editText;
     private final int CODE_IMAGE = 6;
     private final int CODE_VIDEO = 7;
-    private int imagesCount = 0;
+    private Question questionBean;
+    private String serverLocation;
+    private Gson gson;
+    private User user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,113 +71,114 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         init();
     }
 
+
     private void init() {
-        question = findViewById(R.id.edit_question);
+        questionBean = (Question) getIntent().getSerializableExtra("question");
+        user = UserUtils.queryUserHistory();
+        this.question = findViewById(R.id.edit_question);
         commit = findViewById(R.id.edit_button_commit);
         editText = findViewById(R.id.edit_edit_text);
         bold = findViewById(R.id.edit_button_bold);
         italic = findViewById(R.id.edit_button_italic);
         title = findViewById(R.id.edit_button_title);
-        reference = findViewById(R.id.edit_button_reference);
+        order = findViewById(R.id.edit_button_order);
         photo = findViewById(R.id.edit_button_photo);
         video = findViewById(R.id.edit_button_video);
         divider = findViewById(R.id.edit_button_divider);
-        editText.setMovementMethod(LinkMovementMethod.getInstance());
+        serverLocation = getResources().getString(R.string.server_location);
+        gson = new Gson();
+        question.setText(questionBean.getName());
+        editText.setPlaceholder("详细描述你的知识、经验或见解吧~");
         setListener();
     }
 
     private void setListener() {
-        editText.addTextChangedListener(textChangeListener());
         commit.setOnClickListener(this);
         bold.setOnClickListener(this);
         italic.setOnClickListener(this);
         title.setOnClickListener(this);
-        reference.setOnClickListener(this);
+        order.setOnClickListener(this);
         photo.setOnClickListener(this);
         video.setOnClickListener(this);
         divider.setOnClickListener(this);
     }
 
-    private TextWatcher textChangeListener() {
-        return new CustomEditTextListener(){
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                index = editText.getSelectionStart();
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(STATE_NOW != STATE_DEFAULT && count>=1){
-                    switch (STATE_NOW){
-                        case STATE_BOLD:
-                            setSpans(new StyleSpan(Typeface.BOLD),count);
-                            break;
-                        case STATE_ITALIC:
-                            setSpans(new StyleSpan(Typeface.ITALIC),count);
-                            break;
-                        case STATE_TITLE:
-                            break;
-                        case STATE_REFERENCE:
-                            break;
-                    }
-                }
-            }
-        };
-    }
-
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.edit_button_commit:
+                String html = editText.getHtml();
+                Integer contentType = HtmlUtils.getContentType(html);
+                if(contentType == HtmlUtils.TYPE_ALL_TEXT){
+                    if(StringUtils.isEmpty(HtmlUtils.getContentFromHtml(html))){
+                        Toast.makeText(this,"回答不能为空",Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+                String url = serverLocation + "/Answer";
+                Map<String,String> map = new HashMap<>();
+                map.put("questionId",String.valueOf(questionBean.getId()));
+                map.put("userId",String.valueOf(user.getUserId()));
+                map.put("contentType",String.valueOf(contentType));
+                File temporaryText = FileUtils.getTemporaryText(html);
+                if(temporaryText.exists()){
+                    RequestUtils.sendFileWithParam(temporaryText, url, "answer", map, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
+                            runOnUiThread(()->{
+                                if(simpleDto.isSuccess()){
+                                    Toast.makeText(EditActivity.this,"回答成功",Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }else{
+                                    Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
+                }else{
+                    Toast.makeText(this,"上传失败",Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.edit_button_bold:
-                setState(STATE_BOLD);
+                editText.setBold();
                 break;
             case R.id.edit_button_italic:
-                setState(STATE_ITALIC);
+                editText.setItalic();
                 break;
             case R.id.edit_button_title:
-                setState(STATE_TITLE);
+                editText.setHeading(1);
                 break;
-            case R.id.edit_button_reference:
-                setState(STATE_REFERENCE);
+            case R.id.edit_button_order:
+                editText.setNumbers();
                 break;
             case R.id.edit_button_photo:
-                index = editText.getSelectionStart();
                 //如果权限已通过
                 if(PermissionUtils.registerPerMission(this,Manifest.permission.READ_EXTERNAL_STORAGE)){
                     getBitMapFromPhotoAlbum();
                 }
                 break;
             case R.id.edit_button_video:
+                //如果权限已通过
+                if(PermissionUtils.registerPerMission(this,Manifest.permission.READ_EXTERNAL_STORAGE)){
+                    getVideoFromPhotoAlbum();
+                }
                 break;
             case R.id.edit_button_divider:
                 break;
         }
     }
 
-    public void setSpans(Object span,int count){
-        CharSequence charSequence = editText.getText().subSequence(index, index+count);
-        Editable editableText = editText.getEditableText();
-        editableText.setSpan(span,index,index+count,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    private void getVideoFromPhotoAlbum() {
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, CODE_VIDEO);
     }
-    public void setImageSpan(Object span){
-        editText.append("\n");
-        int selectionStart = editText.getSelectionStart();
-        String location = getString(R.string.server_location)+"/answer/id/image/"+imagesCount;
-        String labelAndLocation = "<img src='"+location+"'/>";
-        SpannableStringBuilder builder = new SpannableStringBuilder(labelAndLocation);
-        builder.setSpan(span,0,labelAndLocation.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(@NonNull View widget) {
-            }
-        },0,labelAndLocation.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        editText.append(builder);
-        editText.append("\n\n");
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == 1){
@@ -188,19 +196,79 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
             switch (requestCode) {
                 case CODE_IMAGE:
                     try {
+                        Toast.makeText(this,"正在上传图片",Toast.LENGTH_SHORT).show();
                         Uri uri = data.getData();
                         Bitmap oldBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
                         Bitmap newBitmap = zoomImg(oldBitmap, 400,400);
-                        ImageSpan imageSpan = new ImageCentreSpan(this, newBitmap);
-                        ++imagesCount;
                         //异步提交图片至服务器(还没写)
-                        setImageSpan(imageSpan);
+                        File file = FileUtils.getFile(newBitmap);
+                        if(file.exists()){
+                            if(FileUtils.checkOutFileSize(file,5242880)){
+                                String url = serverLocation + "/Upload/Image/"+user.getUserId();
+                                RequestUtils.sendSingleFile(file, url, "image", new Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+                                        runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
+                                        runOnUiThread(()->{
+                                            if(simpleDto.isSuccess()){
+                                                String url = serverLocation + "/res/Image/" + simpleDto.getMsg();
+                                                editText.insertImage(url);
+                                            }else{
+                                                Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
+                            }else{
+                                Toast.makeText(this,"图片不能超过5MB",Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
+                            Toast.makeText(this,"找不到文件",Toast.LENGTH_SHORT).show();
+                        }
+
                     }catch (Exception e){
                         e.printStackTrace();
                     }
                     break;
                 case CODE_VIDEO:
                     try {
+                        Toast.makeText(this,"正在上传视频",Toast.LENGTH_SHORT).show();
+                        Uri uri = data.getData();
+                        String filePath = FileUtils.getRealPathFromURI(this, uri);
+                        File file = new File(filePath);
+                        if(file.exists()){
+                            if(FileUtils.checkOutFileSize(file,20971520)){
+                                String url = serverLocation + "/Upload/Video/" + user.getUserId();
+                                RequestUtils.sendSingleFile(file, url, "video", new Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+                                        runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
+                                        runOnUiThread(()->{
+                                            if(simpleDto.isSuccess()){
+                                                String url = serverLocation + "/res/Video/" + simpleDto.getMsg();
+                                                editText.insertVideo(url);
+                                            }else{
+                                                Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
+                            }else{
+                                Toast.makeText(this,"文件大小不能超过20MB",Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
+                            Toast.makeText(this,"找不到文件",Toast.LENGTH_SHORT).show();
+                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -214,26 +282,6 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(Intent.ACTION_PICK,null);
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
         startActivityForResult(intent,CODE_IMAGE);
-    }
-    public boolean setState(int state){
-        if(STATE_NOW == state){
-            STATE_NOW = STATE_DEFAULT;
-            setButtonBackground(state,R.color.black);
-            return false;
-        }else{
-            STATE_NOW = state;
-            setButtonBackground(state,R.color.blue);
-            return true;
-        }
-    }
-    public void setButtonBackground(int CODE,int color){
-        switch (CODE){
-            case STATE_BOLD:
-                bold.setTextColor(color);
-                break;
-            case STATE_ITALIC:
-                italic.setTextColor(color);
-        }
     }
     public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight) {
         // 获得图片的宽高

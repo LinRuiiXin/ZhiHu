@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sz.zhihu.R;
-import com.sz.zhihu.vo.CardViewBean;
+import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.util.List;
 /*
@@ -23,10 +23,10 @@ import java.util.List;
 * */
 public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
     private Context context;
-    private List<CardViewBean> data;
+    private List<RecommendViewBean> data;
     private final LayoutInflater inflater;
 
-    public RecommendRecyclerViewAdapter(Context context,List<CardViewBean> data){
+    public RecommendRecyclerViewAdapter(Context context,List<RecommendViewBean> data){
         this.context = context;
         this.data = data;
         inflater = LayoutInflater.from(context);
@@ -36,7 +36,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
     private final int VIEW_HAS_VIDEO = 3;
     @Override
     public int getItemViewType(int position) {
-        CardViewBean cardViewBean = data.get(position);
+        RecommendViewBean cardViewBean = data.get(position);
         int type = cardViewBean.getType();
         switch (type){
             case VIEW_HAS_VIDEO:
@@ -66,7 +66,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
     @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        CardViewBean cardViewBean = data.get(position);
+        RecommendViewBean cardViewBean = data.get(position);
         int type = cardViewBean.getType();
         if(type == VIEW_ALL_TEXT){
             if(holder instanceof AllTextViewHolder){

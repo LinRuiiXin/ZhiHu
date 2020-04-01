@@ -87,7 +87,7 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
 
     private void setListeners() {
         portrait.setOnClickListener((v)->{
-            if(PermissionUtils.registerPerMission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)){
+            if(PermissionUtils.registerFragmentPerMission(activity,this, Manifest.permission.READ_EXTERNAL_STORAGE)){
                 getBitMapFromPhotoAlbum();
             }
         });
@@ -142,9 +142,10 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
                                     activity.runOnUiThread(()->{
                                         if(simpleDto.isSuccess()){
                                             newUser = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                            newUser.setUserId(newUser.getId());
                                             newUser.save();
                                             Toast.makeText(activity,"注册成功，正在为您上传头像...",Toast.LENGTH_SHORT).show();
-                                            uploadPortrait(simpleDto);
+                                            uploadPortrait(newUser);
                                         }else{
                                             if(simpleDto.getObject() != null){
                                                 Map<String,String> failMsg = (Map<String, String>) simpleDto.getObject();
@@ -173,11 +174,9 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
         });
     }
 
-    private void uploadPortrait(SimpleDto simpleDto) {
-
-        User newUser = gson.fromJson(simpleDto.getObject().toString(),User.class);
-        Long id = newUser.getId();
-        String url = serverLocation + "/upload/portrait/" + id;
+    private void uploadPortrait(User user) {
+        Long id = user.getUserId();
+        String url = serverLocation + "/Upload/Portrait/" + id;
         RequestUtils.sendSingleFile(portraitFile, url, "portrait", new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -189,11 +188,11 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
                 SimpleDto res = gson.fromJson(response.body().string(), SimpleDto.class);
                 activity.runOnUiThread(()->{
                     if(!res.isSuccess()){
-                        Toast.makeText(activity,"上传失败",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity,res.getMsg(),Toast.LENGTH_SHORT).show();
                     }else{
-                        String portraitFileName = simpleDto.getMsg();
-                        newUser.setPortraitFileName(portraitFileName);
-                        newUser.save();
+                        String portraitFileName = res.getMsg();
+                        user.setPortraitFileName(portraitFileName);
+                        user.save();
                     }
                     Intent intent = new Intent(activity, MainActivity.class);
                     activity.startActivity(intent);
@@ -206,7 +205,7 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == PermissionUtils.REQUEST_CODE){
             String[] permissionNotAgrees = ArrayUtils.getPermissionNotAgrees(permissions, grantResults);
-            if(permissionNotAgrees.length == 0 || permissionNotAgrees == null){
+            if(permissionNotAgrees.length == 0){
                 getBitMapFromPhotoAlbum();
             }else{
                 Toast.makeText(activity,"请先通过授权",Toast.LENGTH_SHORT).show();

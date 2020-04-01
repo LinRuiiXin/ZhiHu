@@ -3,7 +3,7 @@ package com.sz.zhihu.vo;
 * 首页---推荐
 *   记录每个卡片的信息
 * */
-public class CardViewBean {
+public class RecommendViewBean {
     private Long contentId;//内容id，用contentType区分文章、回答
     private Long userId;//用户id
     private int contentType; //1-回答 2.文章
@@ -16,7 +16,7 @@ public class CardViewBean {
     private Long commentSum;//评论数
 
 
-    public CardViewBean(Long contentId, Long userId, int contentType, int type, String title, String username, String introduction, String content, Long supportSum, Long commentSum) {
+    public RecommendViewBean(Long contentId, Long userId, int contentType, int type, String title, String username, String introduction, String content, Long supportSum, Long commentSum) {
         this.contentId = contentId;
         this.userId = userId;
         this.contentType = contentType;

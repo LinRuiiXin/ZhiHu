@@ -30,8 +30,7 @@ public class MineFragment extends Fragment implements CustomFragmentFunction {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(view == null){
             view = inflater.inflate(R.layout.fragment_mine,container,false);
-            FrameLayout frameLayout = view.findViewById(R.id.mine_card);
-            if(UserUtils.isLogged()){
+            if(UserUtils.queryUserHistory() != null){
                 getChildFragmentManager().beginTransaction().replace(R.id.mine_card,getLogFragment()).commit();
             }else{
                 getChildFragmentManager().beginTransaction().replace(R.id.mine_card,getNotLogFragment()).commit();

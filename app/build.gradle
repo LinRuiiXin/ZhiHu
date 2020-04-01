@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.sz.zhihu"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -38,9 +38,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.astuetz:pagerslidingtabstrip:1.0.1'
     implementation 'de.gerdi-project:GSON:6.0.6'
-    compile 'com.makeramen:roundedimageview:2.2.1'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
-    compile 'com.squareup.okio:okio:1.12.0'
+    implementation 'com.makeramen:roundedimageview:2.2.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.8.0'
+    implementation 'com.squareup.okio:okio:1.12.0'
     // litepal数据库
-    compile 'org.litepal.android:core:1.6.1'
+    implementation 'org.litepal.android:core:1.6.1'
+
+    implementation 'com.github.RexSuper:RichEditor:1.0.3'
 }

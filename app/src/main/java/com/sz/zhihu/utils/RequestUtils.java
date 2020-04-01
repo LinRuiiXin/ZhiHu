@@ -1,10 +1,14 @@
 package com.sz.zhihu.utils;
 
+import android.os.Build;
 import android.provider.MediaStore;
+
+import androidx.annotation.RequiresApi;
 
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -16,6 +20,7 @@ import okhttp3.RequestBody;
 //请求工具类
 public class RequestUtils {
     private static Gson gson = new Gson();
+    private static OkHttpClient httpClient = new OkHttpClient();
     /**
      * 传入服务器接口，回调接口实现(Get提交)
      */
@@ -33,33 +38,33 @@ public class RequestUtils {
     * @callback 回调接口
     * */
     public static void sendRequestWithJson(Object o,String url,Callback callback){
-        OkHttpClient httpClient = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"),gson.toJson(o));
         Request request = new Request.Builder().post(requestBody).url(url).addHeader("contentType", "application/json").addHeader("acceptType", "application/json").build();
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
     }
     public static void sendSingleFile(File file,String url,String fileName,Callback callback){
-        OkHttpClient httpClient = new OkHttpClient();
-//        String[] split = file.getName().split("\\.");
-//        String format = new String();
-//        switch (split[split.length-1]){
-//            case "txt":
-//                format = "text/plain";
-//                break;
-//            case "jpg":
-//                format = "image/jpeg";
-//                break;
-//            case "png":
-//                format = "image/png";
-//                break;
-//            case "mp4":
-//                format = "text/plain";
-//                break;
-//        }
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("portrait", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file)).build();
+                .addFormDataPart(fileName, file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file)).build();
+        Request request = new Request.Builder().post(requestBody).url(url).build();
+        Call call = httpClient.newCall(request);
+        call.enqueue(callback);
+    }
+    /*
+    * 携带参数上传文件
+    * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void sendFileWithParam(File file, String url, String fileName, Map<String,String> params, Callback callback){
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        if(file.exists()){
+            builder.addFormDataPart(fileName, file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+        }
+        params.keySet().forEach(key->{
+            builder.addFormDataPart(key,params.get(key));
+        });
+        MultipartBody requestBody = builder.build();
         Request request = new Request.Builder().post(requestBody).url(url).build();
         Call call = httpClient.newCall(request);
         call.enqueue(callback);

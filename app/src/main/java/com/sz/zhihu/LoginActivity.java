@@ -1,6 +1,5 @@
 package com.sz.zhihu;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,12 +12,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
-import com.sz.zhihu.dialog.MailLoginDialog;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomEditTextListener;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DiaLogUtils;
-import com.sz.zhihu.utils.RegexUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
@@ -78,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String content = s.toString();
-                if(!RegexUtils.isEmail(content)){
+                if(!ValidateUtil.validate(content,ValidateUtil.mailRegex)){
                     mail.setError("邮箱格式不正确");
                     login.setBackgroundResource(R.drawable.login_log_button_shape_disable);
                     return;
@@ -100,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String mailContent = mail.getText().toString();
-                if (!RegexUtils.isEmail(mailContent)) {
+                if (!ValidateUtil.validate(mailContent,ValidateUtil.mailRegex)) {
                     mail.setError("邮箱格式不正确");
                     login.setBackgroundResource(R.drawable.login_log_button_shape_disable);
                     return;
@@ -134,6 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                             runOnUiThread(()->{
                                 if(simpleDto.isSuccess()){
                                     User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                    user.setUserId(user.getId());
                                     user.save();
                                     Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                                     startActivity(intent);

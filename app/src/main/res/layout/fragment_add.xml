@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <ImageView
         android:src="@drawable/icon_down"
@@ -40,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:background="@drawable/shadow"
-        android:id="@+id/et_question"
+        android:id="@+id/add_et_question"
         android:layout_below="@id/ll_day"
         android:layout_marginLeft="35dp"
         android:layout_marginRight="35dp"
@@ -53,78 +52,98 @@
             android:layout_marginTop="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"/>
-        <EditText
+        <TextView
             android:layout_width="fill_parent"
             android:layout_height="70dp"
             android:layout_toRightOf="@id/iv_icon_question"
             android:layout_marginRight="35dp"
             android:hint="提个问题"
-            android:background="@null"/>
+            android:background="@null"
+            android:gravity="center_vertical"
+            />
     </RelativeLayout>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="150dp"
-        android:layout_below="@id/et_question"
+        android:layout_below="@id/add_et_question"
         android:layout_marginTop="40dp"
         android:layout_marginLeft="35dp"
         android:layout_marginRight="35dp">
         <RelativeLayout
-            android:layout_width="115dp"
-            android:layout_height="150dp">
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            android:id="@+id/add_answer_question"
+            >
             <ImageView
                 android:src="@drawable/icon_answer"
                 android:id="@+id/iv_answer_top"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="35dp"/>
+                android:layout_margin="35dp"
+                android:layout_centerHorizontal="true"
+                />
             <TextView
                 android:layout_below="@id/iv_answer_top"
                 android:id="@+id/tv_answer_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="回答问题"
-                android:textSize="20sp"
+                android:text="答问题"
+                android:textSize="15sp"
+                android:gravity="center_horizontal"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:paddingBottom="10dp"/>
 
         </RelativeLayout>
         <RelativeLayout
-            android:layout_width="115dp"
-            android:layout_height="150dp">
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            android:id="@+id/add_add_video"
+            >
             <ImageView
                 android:src="@drawable/icon_movice"
                 android:id="@+id/iv_movice_top"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="35dp"/>
+                android:layout_margin="35dp"
+                android:layout_centerHorizontal="true"
+                />
             <TextView
                 android:layout_below="@id/iv_movice_top"
                 android:id="@+id/tv_movice_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="发视频"
-                android:textSize="20sp"
+                android:textSize="15sp"
+                android:gravity="center_horizontal"
                 android:paddingLeft="20dp"
                 android:paddingRight="25dp"
                 android:paddingBottom="10dp"/>
         </RelativeLayout>
         <RelativeLayout
-            android:layout_width="115dp"
-            android:layout_height="150dp">
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:layout_weight="1"
+            android:id="@+id/add_write_article"
+            >
             <ImageView
                 android:src="@drawable/icon_actice"
                 android:id="@+id/iv_actice_top"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_margin="35dp"/>
+                android:layout_margin="35dp"
+                android:layout_centerHorizontal="true"
+                />
             <TextView
                 android:layout_below="@id/iv_actice_top"
                 android:id="@+id/tv_actice_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="写文章"
-                android:textSize="20sp"
+                android:textSize="15sp"
+                android:gravity="center_horizontal"
                 android:paddingLeft="25dp"
                 android:paddingRight="25dp"
                 android:paddingBottom="10dp"/>

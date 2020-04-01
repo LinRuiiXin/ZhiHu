@@ -61,6 +61,7 @@
         android:maxLines="2"
         android:layout_below="@+id/answer_has_video_video"
         android:layout_margin="7dp"
+        android:textColor="#000"
         />
     <LinearLayout
         android:layout_width="match_parent"

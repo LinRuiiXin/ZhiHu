@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="10dp"
+    android:background="@drawable/dialog_search_item"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_search_item_name"
+        android:layout_centerHorizontal="true"
+        android:text="科学"
+        android:layout_marginTop="20dp"
+        android:textSize="18dp"
+        />
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:id="@+id/dialog_search_item_add"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/dialog_search_item_name"
+        android:layout_marginTop="10dp"
+        android:text="添加"
+        android:textColor="#fff"
+        android:textSize="9dp"
+        android:background="@drawable/login_log_button_shape_enable"
+        />
+</RelativeLayout>

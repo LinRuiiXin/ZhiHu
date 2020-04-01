@@ -41,4 +41,5 @@ public class MailLoginDialog extends Dialog {
     public MailLoginDialog(@NonNull Context context, int themeResId) {
         super(context, themeResId);
     }
+
 }
