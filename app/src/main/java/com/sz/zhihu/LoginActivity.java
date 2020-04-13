@@ -130,7 +130,9 @@ public class LoginActivity extends AppCompatActivity {
                             SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
                             runOnUiThread(()->{
                                 if(simpleDto.isSuccess()){
-                                    User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                    String s = gson.toJson(simpleDto.getObject());
+                                    User user = gson.fromJson(s, User.class);
+//                                    User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
                                     user.setUserId(user.getId());
                                     user.save();
                                     Intent intent = new Intent(LoginActivity.this,MainActivity.class);

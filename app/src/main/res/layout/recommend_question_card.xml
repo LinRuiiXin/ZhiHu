@@ -44,7 +44,7 @@
         android:layout_alignLeft="@id/rqc_question"
         android:textColor="#d6d6d6"
         android:textSize="10dp" />
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
@@ -54,32 +54,31 @@
             android:layout_width="23dp"
             android:layout_height="23dp"
             android:id="@+id/rqc_portrait"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
             app:riv_oval="true"
             android:src="@drawable/default_portrait"
+            android:scaleType="centerCrop"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/rqc_username"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/rqc_portrait"
             android:layout_marginLeft="10dp"
             android:textSize="12dp"
             />
-        <TextView
-            android:layout_width="155dp"
-            android:layout_height="match_parent"
-
-            />
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="50dp"
             android:id="@+id/rqc_care"
             android:background="@drawable/rqc_button_enable_shape"
             android:text="+ 关注问题"
             android:textSize="10dp"
             android:textColor="@color/ZhiHuBlue"
+            android:layout_alignParentRight="true"
+
             />
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

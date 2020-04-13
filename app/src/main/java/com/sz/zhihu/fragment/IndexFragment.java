@@ -1,5 +1,6 @@
 package com.sz.zhihu.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
@@ -28,7 +29,7 @@ import com.sz.zhihu.fragment.index.RecommendFragment;
 * */
 public class IndexFragment extends Fragment implements CustomFragmentFunction {
     View indexView = null;
-    Context context;
+    Activity activity;
     private View view = null;
     private PagerSlidingTabStrip strip;
     private ViewPager viewPager;
@@ -39,7 +40,9 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.context = context;
+        if(context instanceof Activity){
+            this.activity = (Activity) context;
+        }
     }
 
     @Nullable
@@ -49,9 +52,9 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
             view = inflater.inflate(R.layout.fragment_index, container, false);
             viewPager = view.findViewById(R.id.index_viewPager);
             careFragment = new CareFragment();
-            recommendFragment = new RecommendFragment(context);
+            recommendFragment = new RecommendFragment(activity);
             hotFragment = new HotFragment();
-            viewPager.setAdapter(new FragmentPagerAdapter(((MainActivity) context).getSupportFragmentManager()) {
+            viewPager.setAdapter(new FragmentPagerAdapter(((MainActivity) activity).getSupportFragmentManager()) {
                 @Nullable
                 @Override
                 public CharSequence getPageTitle(int position) {

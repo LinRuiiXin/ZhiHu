@@ -43,13 +43,13 @@
             android:layout_marginLeft="10dp"
             />
         <TextView
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="28dp"
+            android:layout_height="26dp"
             android:id="@+id/mine_setting"
             android:background="@drawable/icon_setting"
             android:layout_toRightOf="@+id/mine_scan"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="6dp"
             />
     </RelativeLayout>
     <FrameLayout

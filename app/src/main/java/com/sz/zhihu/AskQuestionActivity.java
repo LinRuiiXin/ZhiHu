@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,6 +38,7 @@ import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
 import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.view.ChoiceTypeView;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,6 +121,7 @@ public class AskQuestionActivity extends AppCompatActivity implements View.OnCli
                 if(!StringUtils.isEmpty(question)){
                     if(!types.isEmpty()){
                         if(question.trim().length()>3){
+                            commit.setEnabled(false);
                             String url = serverLocation + "/Question";
                             Map<String,String> map = new HashMap<>();
                             map.put("userId",String.valueOf(user.getUserId()));
@@ -132,7 +135,10 @@ public class AskQuestionActivity extends AppCompatActivity implements View.OnCli
                             RequestUtils.sendFileWithParam(file, url, "describe",map, new Callback() {
                                 @Override
                                 public void onFailure(Call call, IOException e) {
-                                    runOnUiThread(()->Toast.makeText(AskQuestionActivity.this,"请求失败",Toast.LENGTH_SHORT).show());
+                                    runOnUiThread(()->{
+                                        Toast.makeText(AskQuestionActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                                        commit.setEnabled(true);
+                                    });
                                 }
 
                                 @Override
@@ -142,9 +148,11 @@ public class AskQuestionActivity extends AppCompatActivity implements View.OnCli
                                         if(simpleDto.isSuccess()){
                                             Toast.makeText(AskQuestionActivity.this,"提问成功",Toast.LENGTH_SHORT).show();
                                             types.clear();
+                                            ChoiceTypeView.refresh();
                                             finish();
                                         }else{
                                             Toast.makeText(AskQuestionActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                            commit.setEnabled(true);
                                         }
                                     });
                                 }

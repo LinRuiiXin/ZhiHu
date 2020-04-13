@@ -9,4 +9,5 @@
     <color name="ZhiHuBlue">#3f87f6</color>
     <color name="ButtonDefaultColor">#DCDCDC</color>
     <color name="editorBackground">#EDEDED</color>
+    <color name="textColorDisable">#ACACAC</color>
 </resources>

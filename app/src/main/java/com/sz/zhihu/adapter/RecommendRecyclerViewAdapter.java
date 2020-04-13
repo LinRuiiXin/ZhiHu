@@ -72,7 +72,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
             if(holder instanceof AllTextViewHolder){
                 AllTextViewHolder viewHolder = (AllTextViewHolder) holder;
                 viewHolder.title.setText(cardViewBean.getTitle());
-                Glide.with(context).load(R.string.server_location).into(viewHolder.portrait);
+                Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
@@ -87,7 +87,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
-                Glide.with(context).load(R.string.server_location).into(viewHolder.image);
+                Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.image);
                 viewHolder.support.setText(cardViewBean.getSupportSum()+"赞同");
                 viewHolder.comments.setText(cardViewBean.getCommentSum()+"评论");
             }
@@ -95,7 +95,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
             if(holder instanceof HasVideoViewHolder){
                 HasVideoViewHolder viewHolder = (HasVideoViewHolder) holder;
                 viewHolder.title.setText(cardViewBean.getTitle());
-                Glide.with(context).load(R.string.server_location).into(viewHolder.portrait);
+                Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());

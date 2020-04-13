@@ -4,6 +4,7 @@ import com.sz.zhihu.po.Question;
 import com.sz.zhihu.po.User;
 
 public class RecommendQuestionViewBean {
+    private boolean subscribe;
     private Question question;
     private User user;
 
@@ -23,10 +24,19 @@ public class RecommendQuestionViewBean {
         this.user = user;
     }
 
+    public boolean isSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(boolean subscribe) {
+        this.subscribe = subscribe;
+    }
+
     @Override
     public String toString() {
-        return "RecommendQuestionCardBean{" +
-                "question=" + question +
+        return "RecommendQuestionViewBean{" +
+                "subscribe=" + subscribe +
+                ", question=" + question +
                 ", user=" + user +
                 '}';
     }

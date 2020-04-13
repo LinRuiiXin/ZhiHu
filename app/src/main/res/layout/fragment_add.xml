@@ -31,6 +31,7 @@
             android:layout_width="216dp"
             android:layout_height="40dp"
             android:padding="8dp"
+            android:id="@+id/add_days"
             android:text="今天是你加入知乎的第1天"
             android:textColor="@color/black"
             android:textSize="16sp" />

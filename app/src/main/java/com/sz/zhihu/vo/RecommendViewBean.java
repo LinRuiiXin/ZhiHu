@@ -5,24 +5,29 @@ package com.sz.zhihu.vo;
 * */
 public class RecommendViewBean {
     private Long contentId;//内容id，用contentType区分文章、回答
+    private Long questionId;//问题id，回答有，文章没有
     private Long userId;//用户id
     private int contentType; //1-回答 2.文章
     private int type;//1-纯文本 2-带图片 3-带视频
     private String title;//标题
     private String username;//用户名
+    private String portraitFileName;//用户头像
     private String introduction;//个人简介
     private String content;//内容
     private Long supportSum;//点赞数
     private Long commentSum;//评论数
 
+    public RecommendViewBean(){}
 
-    public RecommendViewBean(Long contentId, Long userId, int contentType, int type, String title, String username, String introduction, String content, Long supportSum, Long commentSum) {
+    public RecommendViewBean(Long contentId, Long questionId, Long userId, int contentType, int type, String title, String username, String portraitFileName, String introduction, String content, Long supportSum, Long commentSum) {
         this.contentId = contentId;
+        this.questionId = questionId;
         this.userId = userId;
         this.contentType = contentType;
         this.type = type;
         this.title = title;
         this.username = username;
+        this.portraitFileName = portraitFileName;
         this.introduction = introduction;
         this.content = content;
         this.supportSum = supportSum;
@@ -35,6 +40,14 @@ public class RecommendViewBean {
 
     public void setContentId(Long contentId) {
         this.contentId = contentId;
+    }
+
+    public Long getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(Long questionId) {
+        this.questionId = questionId;
     }
 
     public Long getUserId() {
@@ -77,6 +90,14 @@ public class RecommendViewBean {
         this.username = username;
     }
 
+    public String getPortraitFileName() {
+        return portraitFileName;
+    }
+
+    public void setPortraitFileName(String portraitFileName) {
+        this.portraitFileName = portraitFileName;
+    }
+
     public String getIntroduction() {
         return introduction;
     }
@@ -111,13 +132,15 @@ public class RecommendViewBean {
 
     @Override
     public String toString() {
-        return "CardViewBean{" +
+        return "RecommendViewBean{" +
                 "contentId=" + contentId +
+                ", questionId=" + questionId +
                 ", userId=" + userId +
                 ", contentType=" + contentType +
                 ", type=" + type +
                 ", title='" + title + '\'' +
                 ", username='" + username + '\'' +
+                ", portraitFileName='" + portraitFileName + '\'' +
                 ", introduction='" + introduction + '\'' +
                 ", content='" + content + '\'' +
                 ", supportSum=" + supportSum +

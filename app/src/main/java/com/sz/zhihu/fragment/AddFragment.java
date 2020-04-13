@@ -3,15 +3,18 @@ package com.sz.zhihu.fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.sz.zhihu.AskQuestionActivity;
@@ -20,6 +23,16 @@ import com.sz.zhihu.RecommendQuestionActivity;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.UserUtils;
+
+import org.litepal.crud.DataSupport;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class AddFragment extends Fragment{
 
@@ -33,6 +46,7 @@ public class AddFragment extends Fragment{
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,12 +57,27 @@ public class AddFragment extends Fragment{
             RelativeLayout answerQuestion = view.findViewById(R.id.add_answer_question);
             RelativeLayout addVideo = view.findViewById(R.id.add_add_video);
             RelativeLayout writeArticle = view.findViewById(R.id.add_write_article);
+            TextView days = view.findViewById(R.id.add_days);
+            days.setText(getDays());
             addQuestion.setOnClickListener(listenerLogged);
             answerQuestion.setOnClickListener(listenerLogged);
             addVideo.setOnClickListener(listenerLogged);
             writeArticle.setOnClickListener(listenerLogged);
         }
         return view;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private String getDays() {
+        User user = UserUtils.queryUserHistory();
+        if(user != null){
+            Date registerDate = user.getRegisterDate();
+            long time = registerDate.getTime();
+            long time1 = new Date().getTime();
+            long bet = time1 - time;
+            long days = bet/86400000;
+            return "今天是你加入ZhiHu的第"+(days+1)+"天";
+        }else return "您还未登录";
     }
 
     private View.OnClickListener onClickListenerLogged() {

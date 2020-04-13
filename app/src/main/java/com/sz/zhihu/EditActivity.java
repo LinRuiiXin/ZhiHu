@@ -108,42 +108,8 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.edit_button_commit:
-                String html = editText.getHtml();
-                Integer contentType = HtmlUtils.getContentType(html);
-                if(contentType == HtmlUtils.TYPE_ALL_TEXT){
-                    if(StringUtils.isEmpty(HtmlUtils.getContentFromHtml(html))){
-                        Toast.makeText(this,"回答不能为空",Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
-                String url = serverLocation + "/Answer";
-                Map<String,String> map = new HashMap<>();
-                map.put("questionId",String.valueOf(questionBean.getId()));
-                map.put("userId",String.valueOf(user.getUserId()));
-                map.put("contentType",String.valueOf(contentType));
-                File temporaryText = FileUtils.getTemporaryText(html);
-                if(temporaryText.exists()){
-                    RequestUtils.sendFileWithParam(temporaryText, url, "answer", map, new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-                            runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
-                            runOnUiThread(()->{
-                                if(simpleDto.isSuccess()){
-                                    Toast.makeText(EditActivity.this,"回答成功",Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }else{
-                                    Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    });
-                }else{
-                    Toast.makeText(this,"上传失败",Toast.LENGTH_SHORT).show();
+                if(PermissionUtils.registerPermissionWithCode(this,PermissionUtils.REQUEST_WRITE,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                    uploadAnswer();
                 }
                 break;
             case R.id.edit_button_bold:
@@ -160,13 +126,13 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.edit_button_photo:
                 //如果权限已通过
-                if(PermissionUtils.registerPerMission(this,Manifest.permission.READ_EXTERNAL_STORAGE)){
+                if(PermissionUtils.registerPermissionWithCode(this,PermissionUtils.REQUEST_IMAGE,Manifest.permission.READ_EXTERNAL_STORAGE)){
                     getBitMapFromPhotoAlbum();
                 }
                 break;
             case R.id.edit_button_video:
                 //如果权限已通过
-                if(PermissionUtils.registerPerMission(this,Manifest.permission.READ_EXTERNAL_STORAGE)){
+                if(PermissionUtils.registerPermissionWithCode(this,PermissionUtils.REQUEST_VIDEO,Manifest.permission.READ_EXTERNAL_STORAGE)){
                     getVideoFromPhotoAlbum();
                 }
                 break;
@@ -179,13 +145,21 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, CODE_VIDEO);
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == 1){
+        if(requestCode == PermissionUtils.REQUEST_IMAGE){
             String[] permissionNotAgrees = ArrayUtils.getPermissionNotAgrees(permissions, grantResults);
             if(permissionNotAgrees == null || permissionNotAgrees.length ==0){
                 getBitMapFromPhotoAlbum();
             }
+        }else if(requestCode == PermissionUtils.REQUEST_VIDEO){
+            String[] permissionNotAgrees = ArrayUtils.getPermissionNotAgrees(permissions, grantResults);
+            if(permissionNotAgrees == null || permissionNotAgrees.length ==0){
+                getVideoFromPhotoAlbum();
+            }
+        }else if(requestCode == PermissionUtils.REQUEST_WRITE){
+            uploadAnswer();
         }
     }
 
@@ -276,7 +250,52 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void uploadAnswer(){
+        String html = editText.getHtml();
+        Integer contentType = HtmlUtils.getContentType(html);
+        if(contentType == HtmlUtils.TYPE_ALL_TEXT){
+            if(StringUtils.isEmpty(HtmlUtils.getContentFromHtml(html))){
+                Toast.makeText(this,"回答不能为空",Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+        commit.setEnabled(false);
+        String url = serverLocation + "/Answer";
+        Map<String,String> map = new HashMap<>();
+        map.put("questionId",String.valueOf(questionBean.getId()));
+        map.put("userId",String.valueOf(user.getUserId()));
+        map.put("contentType",String.valueOf(contentType));
+        map.put("content",(HtmlUtils.getContentFromHtml(html)).substring(0,30));
+        File temporaryText = FileUtils.getTemporaryText(html);
+        if(temporaryText.exists()){
+            RequestUtils.sendFileWithParam(temporaryText, url, "answer", map, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(()->{
+                        Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show();
+                        commit.setEnabled(true);
+                    });
+                }
 
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
+                    runOnUiThread(()->{
+                        if(simpleDto.isSuccess()){
+                            Toast.makeText(EditActivity.this,"回答成功",Toast.LENGTH_SHORT).show();
+                            finish();
+                        }else{
+                            Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                            commit.setEnabled(true);
+                        }
+                    });
+                }
+            });
+        }else{
+            Toast.makeText(this,"上传失败",Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void getBitMapFromPhotoAlbum() {
         Intent intent = new Intent(Intent.ACTION_PICK,null);

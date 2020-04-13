@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +18,10 @@ import com.sz.zhihu.adapter.RecommendQuestionCardAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.manager.SwipeCardCallBack;
 import com.sz.zhihu.manager.SwipeCardLayoutManager;
+import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.SystemUtils;
+import com.sz.zhihu.utils.UserUtils;
 import com.sz.zhihu.vo.RecommendQuestionViewBean;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class RecommendQuestionActivity extends AppCompatActivity {
     private String serverLocation;
     private Gson gson;
     private RecommendQuestionCardAdapter adapter;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class RecommendQuestionActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.arq_card);
         writeAnswer = findViewById(R.id.arq_write_answer);
         adapter = new RecommendQuestionCardAdapter(this, beans);
+        user = UserUtils.queryUserHistory();
         SwipeCardLayoutManager swipeCardLayoutManager = new SwipeCardLayoutManager(this);
         SwipeCardCallBack swipeCardCallBack = new SwipeCardCallBack(){
             @Override
@@ -77,14 +80,18 @@ public class RecommendQuestionActivity extends AppCompatActivity {
             finish();
         });
         writeAnswer.setOnClickListener(v->{
-            Intent intent = new Intent(RecommendQuestionActivity.this,EditActivity.class);
-            intent.putExtra("question",beans.get((beans.size()-1)).getQuestion());
-            startActivity(intent);
+            if(beans.size() != 0){
+                Intent intent = new Intent(RecommendQuestionActivity.this,EditActivity.class);
+                intent.putExtra("question",beans.get((beans.size()-1)).getQuestion());
+                startActivity(intent);
+            }else{
+                Toast.makeText(this,"请求失败",Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void getData() {
-        String url = serverLocation + "/Question/Random";
+        String url = serverLocation + "/Question/Random/"+user.getUserId();
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -100,7 +107,6 @@ public class RecommendQuestionActivity extends AppCompatActivity {
                         String s = gson.toJson(simpleDto.getObject());
                         List list = gson.fromJson(s,ArrayList.class);
                         list.forEach(o -> {
-
                             RecommendQuestionViewBean recommendQuestionCardBean = gson.fromJson(gson.toJson(o), RecommendQuestionViewBean.class);
                             beans.add(recommendQuestionCardBean);
                         });

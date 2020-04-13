@@ -69,4 +69,30 @@ public class RequestUtils {
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void postWithParams(String url, Map<String,String> params, Callback callback){
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        params.keySet().forEach(key->{
+            builder.addFormDataPart(key,params.get(key));
+        });
+        MultipartBody requestBody = builder.build();
+        Request request = new Request.Builder().post(requestBody).url(url).build();
+        Call call = httpClient.newCall(request);
+        call.enqueue(callback);
+    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static void deleteWithParams(String url, Map<String,String> params, Callback callback){
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        params.keySet().forEach(key->{
+            builder.addFormDataPart(key,params.get(key));
+        });
+        MultipartBody requestBody = builder.build();
+        Request request = new Request.Builder().delete(requestBody).url(url).build();
+        Call call = httpClient.newCall(request);
+        call.enqueue(callback);
+    }
+
 }

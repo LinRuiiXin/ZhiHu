@@ -1,51 +1,66 @@
 package com.sz.zhihu.fragment.index;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.gson.Gson;
 import com.sz.zhihu.R;
 import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
+import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
+import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.FileUtils;
+import com.sz.zhihu.utils.HtmlUtils;
+import com.sz.zhihu.utils.RequestUtils;
+import com.sz.zhihu.utils.UserUtils;
 import com.sz.zhihu.vo.RecommendViewBean;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class RecommendFragment extends Fragment implements CustomFragmentFunction {
 
     private View view;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Context context;
-    private Handler handler = new Handler(){
-        //刷新，UI线程
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            swipeRefreshLayout.setRefreshing(false);
-        }
-    };
+    private Activity activity;
+    private Handler handler = new Handler(msg->{
+        swipeRefreshLayout.setRefreshing(false);
+        return false;
+    });
     private List<RecommendViewBean> data;
-    public RecommendFragment(Context context){
-        this.context = context;
+    private final User user;
+    private final String serverLocation;
+    private final Gson gson;
+    private RecommendRecyclerViewAdapter adapter;
+
+    public RecommendFragment(Activity activity){
+        this.activity = activity;
         data = new ArrayList<RecommendViewBean>();
-        for(int i=0;i<10;i++){
-            data.add(new RecommendViewBean(1L,1L,1,1,"你看过最细思恐极的图片是什么","林瑞鑫","知乎 官方账号","2个荷兰女孩结伴去巴拿马旅行，在雨林中失踪。三个月后尸体出现在河边，和残骸一起发现的还有",12344L,212134L));
-            data.add(new RecommendViewBean(1L,1L,1,1,"hello23","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-            data.add(new RecommendViewBean(1L,1L,1,3,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-            data.add(new RecommendViewBean(1L,1L,1,2,"hello34","林瑞鑫","devdevdec","理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊理解大手大脚是多久啊是滴哦案件呆多久啊",12344L,212134L));
-        }
+        user = UserUtils.queryUserHistory();
+        serverLocation = activity.getResources().getString(R.string.server_location);
+        gson = new Gson();
     }
     @SuppressLint("ResourceAsColor")
     @Nullable
@@ -58,7 +73,9 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
             swipeRefreshLayout.setOnRefreshListener(onRefreshListener());
             RecyclerView recyclerView = view.findViewById(R.id.recommend_recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setAdapter(new RecommendRecyclerViewAdapter(getContext(),data));
+            adapter = new RecommendRecyclerViewAdapter(getContext(), data);
+            recyclerView.setAdapter(adapter);
+            getData();
         }
         return view;
     }
@@ -80,5 +97,38 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
         return ()->{
             handler.sendEmptyMessageDelayed(0,3000);
         };
+    }
+    public void getData(){
+        String url;
+        if(user == null){
+            url = serverLocation + "/Recommend/Index/-1";
+        }else{
+            url = serverLocation + "/Recommend/Index/" + user.getUserId();
+        }
+
+        RequestUtils.sendSimpleRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                activity.runOnUiThread(()-> Toast.makeText(activity,"请求失败",Toast.LENGTH_SHORT).show());
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                activity.runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        List list = gson.fromJson(simpleDto.getObject().toString(), List.class);
+                        list.forEach(o->{
+                            RecommendViewBean recommendViewBean = gson.fromJson(o.toString(), RecommendViewBean.class);
+                            data.add(recommendViewBean);
+                        });
+                        adapter.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(activity,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 }

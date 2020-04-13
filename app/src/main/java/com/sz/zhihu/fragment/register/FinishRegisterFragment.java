@@ -141,7 +141,9 @@ public class FinishRegisterFragment extends Fragment implements CustomFragmentFu
                                     SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
                                     activity.runOnUiThread(()->{
                                         if(simpleDto.isSuccess()){
-                                            newUser = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                            String s = gson.toJson(simpleDto.getObject());
+                                            newUser = gson.fromJson(s,User.class);
+//                                            newUser = gson.fromJson(simpleDto.getObject().toString(),User.class);
                                             newUser.setUserId(newUser.getId());
                                             newUser.save();
                                             Toast.makeText(activity,"注册成功，正在为您上传头像...",Toast.LENGTH_SHORT).show();

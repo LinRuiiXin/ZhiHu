@@ -31,6 +31,9 @@ import okhttp3.Response;
 
 public class ChoiceTypeView {
     private static View view = null;
+    private static TextView choiceNum;
+    private static RecyclerView recyclerView;
+
     private ChoiceTypeView(){}
     public static View getView(Activity activity){
         if(view == null){
@@ -40,8 +43,8 @@ public class ChoiceTypeView {
                     Gson gson = new Gson();
                     view = View.inflate(activity, R.layout.dialog_choice_type,null);
                     EditText search = view.findViewById(R.id.dialog_ct_search);
-                    RecyclerView recyclerView = view.findViewById(R.id.dialog_ct_recyclerView);
-                    TextView choiceNum = view.findViewById(R.id.dialog_ct_choice_num);
+                    recyclerView = view.findViewById(R.id.dialog_ct_recyclerView);
+                    choiceNum = view.findViewById(R.id.dialog_ct_choice_num);
                     choiceNum.setText("已选:"+ AskQuestionActivity.types.size());
                     QuestionTypeAdapter adapter = new QuestionTypeAdapter(activity,search,size->{
                         choiceNum.setText("已选:"+size);
@@ -88,5 +91,9 @@ public class ChoiceTypeView {
             }
         }
         return view;
+    }
+    public static void refresh(){
+        choiceNum.setText("已选:0");
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 }
