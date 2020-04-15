@@ -34,6 +34,7 @@ import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.Call;
@@ -71,6 +72,7 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
             swipeRefreshLayout = view.findViewById(R.id.index_recommend_refresh);
             swipeRefreshLayout.setColorSchemeColors(R.color.blue);
             swipeRefreshLayout.setOnRefreshListener(onRefreshListener());
+            swipeRefreshLayout.setRefreshing(true);
             RecyclerView recyclerView = view.findViewById(R.id.recommend_recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             adapter = new RecommendRecyclerViewAdapter(getContext(), data);
@@ -95,7 +97,8 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     * */
     public SwipeRefreshLayout.OnRefreshListener onRefreshListener(){
         return ()->{
-            handler.sendEmptyMessageDelayed(0,3000);
+            data.clear();
+            getData();
         };
     }
     public void getData(){
@@ -118,11 +121,14 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
                 SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
                 activity.runOnUiThread(()->{
                     if(simpleDto.isSuccess()){
-                        List list = gson.fromJson(simpleDto.getObject().toString(), List.class);
+                        String s = gson.toJson(simpleDto.getObject());
+                        List list = gson.fromJson(s, List.class);
                         list.forEach(o->{
-                            RecommendViewBean recommendViewBean = gson.fromJson(o.toString(), RecommendViewBean.class);
+                            RecommendViewBean recommendViewBean = gson.fromJson(gson.toJson(o), RecommendViewBean.class);
                             data.add(recommendViewBean);
                         });
+                        Collections.shuffle(data);
+                        swipeRefreshLayout.setRefreshing(false);
                         adapter.notifyDataSetChanged();
                     }else{
                         Toast.makeText(activity,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();

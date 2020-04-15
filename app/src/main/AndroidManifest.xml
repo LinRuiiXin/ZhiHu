@@ -15,7 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".RecommendQuestionActivity"></activity>
+        <activity android:name=".AnswerActivity"></activity>
+        <activity android:name=".ArticleActivity" />
+        <activity android:name=".RecommendQuestionActivity" />
         <activity android:name=".AskQuestionActivity" />
         <activity
             android:name=".RegisterActivity"

@@ -1,7 +1,9 @@
 package com.sz.zhihu.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.sz.zhihu.AnswerActivity;
+import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.vo.RecommendViewBean;
 
@@ -22,14 +26,18 @@ import java.util.List;
 * 负责渲染CardViewBean，传入CardViewBean的集合，就可以按照类型(纯文本，带图，带视频)将数据按照合适的布局显示
 * */
 public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
-    private Context context;
+    private Activity context;
     private List<RecommendViewBean> data;
     private final LayoutInflater inflater;
+    private final String serverLocation;
 
     public RecommendRecyclerViewAdapter(Context context,List<RecommendViewBean> data){
-        this.context = context;
+        if(context instanceof Activity) {
+            this.context = (Activity) context;
+        }
         this.data = data;
         inflater = LayoutInflater.from(context);
+        serverLocation = context.getResources().getString(R.string.server_location);
     }
     private final int VIEW_ALL_TEXT = 1;
     private final int VIEW_HAS_IMAGE = 2;
@@ -72,35 +80,38 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
             if(holder instanceof AllTextViewHolder){
                 AllTextViewHolder viewHolder = (AllTextViewHolder) holder;
                 viewHolder.title.setText(cardViewBean.getTitle());
-                Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
+                Glide.with(context).load(serverLocation+"/res/User/"+cardViewBean.getUserId()+"/"+cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
                 viewHolder.support.setText(cardViewBean.getSupportSum()+"赞同");
                 viewHolder.comments.setText(cardViewBean.getCommentSum()+"评论");
+                viewHolder.setOnClickListener(cardViewBean);
             }
         }else if(type == VIEW_HAS_IMAGE){
             if(holder instanceof HasImageViewHolder){
                 HasImageViewHolder viewHolder = (HasImageViewHolder) holder;
                 viewHolder.title.setText(cardViewBean.getTitle());
-                Glide.with(context).load(R.string.server_location).into(viewHolder.portrait);
+                Glide.with(context).load(serverLocation+"/res/User/"+cardViewBean.getUserId()+"/"+cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
                 Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.image);
                 viewHolder.support.setText(cardViewBean.getSupportSum()+"赞同");
+                viewHolder.setOnClickListener(cardViewBean);
                 viewHolder.comments.setText(cardViewBean.getCommentSum()+"评论");
             }
         }else if(type == VIEW_HAS_VIDEO){
             if(holder instanceof HasVideoViewHolder){
                 HasVideoViewHolder viewHolder = (HasVideoViewHolder) holder;
                 viewHolder.title.setText(cardViewBean.getTitle());
-                Glide.with(context).load(cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
+                Glide.with(context).load(serverLocation+"/res/User/"+cardViewBean.getUserId()+"/"+cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
                 viewHolder.support.setText(cardViewBean.getSupportSum()+"赞同");
                 viewHolder.comments.setText(cardViewBean.getCommentSum()+"评论");
+                viewHolder.setOnClickListener(cardViewBean);
             }
         }
     }
@@ -110,7 +121,26 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
         return data.size();
     }
 
-    class AllTextViewHolder extends RecyclerView.ViewHolder{
+    class CustomViewHolder extends RecyclerView.ViewHolder{
+        private View view;
+        public CustomViewHolder(@NonNull View itemView) {
+            super(itemView);
+            this.view = itemView;
+        }
+        public void setOnClickListener(RecommendViewBean viewBean){
+            this.view.setOnClickListener(v->{
+                Intent intent = null;
+                if(viewBean.getContentType() == 1){
+                    intent = new Intent(context,AnswerActivity.class);
+                }else{
+                    intent = new Intent(context, ArticleActivity.class);
+                }
+                intent.putExtra("viewBean",viewBean);
+                context.startActivity(intent);
+            });
+        }
+    }
+    class AllTextViewHolder extends CustomViewHolder{
 
         public final TextView title;
         public final ImageView portrait;
@@ -132,7 +162,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
         }
     }
 
-    class HasImageViewHolder extends RecyclerView.ViewHolder{
+    class HasImageViewHolder extends CustomViewHolder{
 
         public final TextView title;
         public final ImageView portrait;
@@ -155,7 +185,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
             comments = itemView.findViewById(R.id.answer_has_image_comments);
         }
     }
-    class HasVideoViewHolder extends RecyclerView.ViewHolder{
+    class HasVideoViewHolder extends CustomViewHolder{
         public final TextView title;
         public final ImageView portrait;
         public final TextView username;

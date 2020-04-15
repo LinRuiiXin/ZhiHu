@@ -1,9 +1,12 @@
 package com.sz.zhihu.vo;
+
+import java.io.Serializable;
+
 /*
 * 首页---推荐
 *   记录每个卡片的信息
 * */
-public class RecommendViewBean {
+public class RecommendViewBean implements Serializable {
     private Long contentId;//内容id，用contentType区分文章、回答
     private Long questionId;//问题id，回答有，文章没有
     private Long userId;//用户id

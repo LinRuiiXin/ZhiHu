@@ -11,4 +11,8 @@
         <item name="colorControlActivated">@color/ZhiHuBlue</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">10sp</item><!--toolbar标题字体大小-->
+    </style>
 </resources>
