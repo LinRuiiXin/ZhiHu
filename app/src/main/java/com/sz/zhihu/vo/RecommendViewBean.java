@@ -1,12 +1,14 @@
 package com.sz.zhihu.vo;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.Serializable;
 
 /*
 * 首页---推荐
 *   记录每个卡片的信息
 * */
-public class RecommendViewBean implements Serializable {
+public class RecommendViewBean extends DataSupport implements Serializable {
     private Long contentId;//内容id，用contentType区分文章、回答
     private Long questionId;//问题id，回答有，文章没有
     private Long userId;//用户id
@@ -17,6 +19,7 @@ public class RecommendViewBean implements Serializable {
     private String portraitFileName;//用户头像
     private String introduction;//个人简介
     private String content;//内容
+    private String thumbnail;
     private Long supportSum;//点赞数
     private Long commentSum;//评论数
 
@@ -117,6 +120,14 @@ public class RecommendViewBean implements Serializable {
         this.content = content;
     }
 
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public Long getSupportSum() {
         return supportSum;
     }
@@ -146,6 +157,7 @@ public class RecommendViewBean implements Serializable {
                 ", portraitFileName='" + portraitFileName + '\'' +
                 ", introduction='" + introduction + '\'' +
                 ", content='" + content + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
                 ", supportSum=" + supportSum +
                 ", commentSum=" + commentSum +
                 '}';

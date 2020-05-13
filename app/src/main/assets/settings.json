@@ -1,0 +1,17 @@
+[
+  {
+    "name" : "基本设置",
+    "className" : ["Account"],
+     "params" : ["账号与安全"]
+  },
+  {
+    "name" : "通知设置",
+    "className" : ["Notify"],
+    "params" : ["全局推送通知设置"]
+  },
+  {
+    "name" : "关于与帮助",
+    "className" : ["AboutAuthor","GitHubLocation","License"],
+    "params" : ["关于作者","Github地址","开源许可"]
+  }
+]

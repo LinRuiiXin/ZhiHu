@@ -15,7 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AnswerActivity"></activity>
+        <activity android:name=".EditVideoActivity"></activity>
+        <activity android:name=".EditArticleActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".BrowseActivity" />
+        <activity android:name=".AnswerActivity" />
         <activity android:name=".ArticleActivity" />
         <activity android:name=".RecommendQuestionActivity" />
         <activity android:name=".AskQuestionActivity" />
@@ -23,7 +27,7 @@
             android:name=".RegisterActivity"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".EditActivity"
+            android:name=".EditAnswerActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".SplashActivity">

@@ -23,7 +23,7 @@ import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.po.Question;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.RequestUtils;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.vo.RecommendQuestionViewBean;
 
 
@@ -60,7 +60,7 @@ public class RecommendQuestionCardAdapter extends RecyclerView.Adapter {
         blue = resources.getColor(R.color.ZhiHuBlue);
         colorDisable = resources.getColor(R.color.textColorDisable);
         gson = new Gson();
-        localUser = UserUtils.queryUserHistory();
+        localUser = DBUtils.queryUserHistory();
     }
     @NonNull
     @Override

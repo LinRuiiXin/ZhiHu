@@ -2,11 +2,8 @@ package com.sz.zhihu.fragment.index;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,16 +23,15 @@ import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
 import com.sz.zhihu.po.User;
-import com.sz.zhihu.utils.FileUtils;
-import com.sz.zhihu.utils.HtmlUtils;
 import com.sz.zhihu.utils.RequestUtils;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -46,20 +42,17 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     private View view;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Activity activity;
-    private Handler handler = new Handler(msg->{
-        swipeRefreshLayout.setRefreshing(false);
-        return false;
-    });
     private List<RecommendViewBean> data;
     private final User user;
     private final String serverLocation;
     private final Gson gson;
     private RecommendRecyclerViewAdapter adapter;
+    private RecyclerView recyclerView;
 
     public RecommendFragment(Activity activity){
         this.activity = activity;
-        data = new ArrayList<RecommendViewBean>();
-        user = UserUtils.queryUserHistory();
+        data = new ArrayList();
+        user = DBUtils.queryUserHistory();
         serverLocation = activity.getResources().getString(R.string.server_location);
         gson = new Gson();
     }
@@ -73,35 +66,47 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
             swipeRefreshLayout.setColorSchemeColors(R.color.blue);
             swipeRefreshLayout.setOnRefreshListener(onRefreshListener());
             swipeRefreshLayout.setRefreshing(true);
-            RecyclerView recyclerView = view.findViewById(R.id.recommend_recyclerView);
+            recyclerView = view.findViewById(R.id.recommend_recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             adapter = new RecommendRecyclerViewAdapter(getContext(), data);
             recyclerView.setAdapter(adapter);
-            getData();
+            getData(list -> {
+                data.addAll(list);
+                adapter.notifyDataSetChanged();
+            });
         }
         return view;
     }
     /*
     * 屏幕移动到最上面，并进行刷新操作
     * 点击首页时被调用，前提是当前在首页---推荐
-    * ---------未完善-------------
     * */
     @Override
     public void refreshPage() {
         swipeRefreshLayout.setRefreshing(true);
-        handler.sendEmptyMessageDelayed(111,3000);
+        recyclerView.smoothScrollToPosition(0);
+        getData(list -> {
+            swipeRefreshLayout.setRefreshing(false);
+            data.clear();
+            data.addAll(list);
+            adapter.notifyDataSetChanged();
+        });
     }
     /*
     * 下拉刷新
-    * ---------未完善-------------
     * */
     public SwipeRefreshLayout.OnRefreshListener onRefreshListener(){
         return ()->{
             data.clear();
-            getData();
+            getData(list -> {
+                data.clear();
+                data.addAll(list);
+                adapter.notifyDataSetChanged();
+            });
         };
     }
-    public void getData(){
+
+    public void getData(Consumer<List<RecommendViewBean>> consumer){
         String url;
         if(user == null){
             url = serverLocation + "/Recommend/Index/-1";
@@ -123,13 +128,14 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
                     if(simpleDto.isSuccess()){
                         String s = gson.toJson(simpleDto.getObject());
                         List list = gson.fromJson(s, List.class);
+                        List<RecommendViewBean> res = new ArrayList<>();
                         list.forEach(o->{
                             RecommendViewBean recommendViewBean = gson.fromJson(gson.toJson(o), RecommendViewBean.class);
-                            data.add(recommendViewBean);
+                            res.add(recommendViewBean);
                         });
-                        Collections.shuffle(data);
                         swipeRefreshLayout.setRefreshing(false);
-                        adapter.notifyDataSetChanged();
+                        Collections.shuffle(res);
+                        consumer.accept(res);
                     }else{
                         Toast.makeText(activity,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
                     }

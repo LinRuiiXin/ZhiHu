@@ -94,7 +94,8 @@ public class LoginOnlyMailView {
                                         SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
                                         activity.runOnUiThread(()->{
                                             if(simpleDto.isSuccess()){
-                                                User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
+                                                String json = gson.toJson(simpleDto.getObject());
+                                                User user = gson.fromJson(json,User.class);
                                                 user.setUserId(user.getId());
                                                 user.save();
                                                 Intent intent = new Intent(activity, MainActivity.class);

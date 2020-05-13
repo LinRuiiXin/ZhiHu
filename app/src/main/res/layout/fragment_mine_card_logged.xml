@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="个人主页"
-                android:textColor="#E6E6E6"
+                android:textColor="#F6F5F5"
                 android:textSize="12dp" />
 
             <TextView
@@ -70,6 +70,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:id="@+id/mine_card_il_care_rl"
             >
             <TextView
                 android:layout_width="wrap_content"
@@ -94,6 +95,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:id="@+id/mine_card_il_collect_rl"
             >
             <TextView
                 android:layout_width="wrap_content"
@@ -118,6 +120,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:id="@+id/mine_card_il_browse_rl"
             >
             <TextView
                 android:layout_width="wrap_content"

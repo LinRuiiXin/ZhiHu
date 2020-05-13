@@ -21,7 +21,7 @@ import com.sz.zhihu.manager.SwipeCardLayoutManager;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.SystemUtils;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.vo.RecommendQuestionViewBean;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class RecommendQuestionActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.arq_card);
         writeAnswer = findViewById(R.id.arq_write_answer);
         adapter = new RecommendQuestionCardAdapter(this, beans);
-        user = UserUtils.queryUserHistory();
+        user = DBUtils.queryUserHistory();
         SwipeCardLayoutManager swipeCardLayoutManager = new SwipeCardLayoutManager(this);
         SwipeCardCallBack swipeCardCallBack = new SwipeCardCallBack(){
             @Override
@@ -81,7 +81,7 @@ public class RecommendQuestionActivity extends AppCompatActivity {
         });
         writeAnswer.setOnClickListener(v->{
             if(beans.size() != 0){
-                Intent intent = new Intent(RecommendQuestionActivity.this,EditActivity.class);
+                Intent intent = new Intent(RecommendQuestionActivity.this, EditAnswerActivity.class);
                 intent.putExtra("question",beans.get((beans.size()-1)).getQuestion());
                 startActivity(intent);
             }else{

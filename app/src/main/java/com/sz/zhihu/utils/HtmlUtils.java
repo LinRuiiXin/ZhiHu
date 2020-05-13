@@ -4,14 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HtmlUtils {
-    public static Integer TYPE_ALL_TEXT = null;
-    public static Integer TYPE_HAS_IMAGE = null;
-    public static Integer TYPE_HAS_VIDEO = null;
-    static {
-        TYPE_ALL_TEXT = 1;
-        TYPE_HAS_IMAGE = 2;
-        TYPE_HAS_VIDEO =3;
-    }
+    public static final Integer TYPE_ALL_TEXT = 1;
+    public static final Integer TYPE_HAS_IMAGE = 2;
+    public static final Integer TYPE_HAS_VIDEO = 3;
     /**
      * 获取html字符串中第一张图片的路径
      * @param htmlcontent

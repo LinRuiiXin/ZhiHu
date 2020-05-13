@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditActivity"
+    tools:context=".EditAnswerActivity"
     android:background="@color/editorBackground"
     android:fitsSystemWindows="true">
     <RelativeLayout
@@ -34,7 +34,7 @@
             android:textColor="#fff"
             />
     </RelativeLayout>
-    <com.rex.editor.view.RichEditorNew
+    <com.sz.zhihu.compoent.RichEditor
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/edit_edit_text"

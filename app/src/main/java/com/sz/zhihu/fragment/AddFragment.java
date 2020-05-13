@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +17,13 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.sz.zhihu.AskQuestionActivity;
+import com.sz.zhihu.EditArticleActivity;
+import com.sz.zhihu.EditVideoActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.RecommendQuestionActivity;
-import com.sz.zhihu.interfaces.CustomFragmentFunction;
 import com.sz.zhihu.po.User;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 
-import org.litepal.crud.DataSupport;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class AddFragment extends Fragment{
@@ -69,7 +61,7 @@ public class AddFragment extends Fragment{
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private String getDays() {
-        User user = UserUtils.queryUserHistory();
+        User user = DBUtils.queryUserHistory();
         if(user != null){
             Date registerDate = user.getRegisterDate();
             long time = registerDate.getTime();
@@ -82,22 +74,25 @@ public class AddFragment extends Fragment{
 
     private View.OnClickListener onClickListenerLogged() {
         return v -> {
-            if(UserUtils.checkIsLogged(activity)){
-                Intent intent;
+            if(DBUtils.checkIsLogged(activity)){
+                Intent intent = null;
                 switch (v.getId()){
                     case R.id.add_et_question:
                         intent = new Intent(activity,AskQuestionActivity.class);
-                        activity.startActivity(intent);
                         break;
                     case R.id.add_answer_question:
                         intent = new Intent(activity, RecommendQuestionActivity.class);
-                        activity.startActivity(intent);
                         break;
                     case R.id.add_add_video:
+                        intent = new Intent(activity, EditVideoActivity.class);
                         break;
                     case R.id.add_write_article:
+                        intent = new Intent(activity, EditArticleActivity.class);
                         break;
                 }
+                activity.startActivity(intent);
+//                activity.overridePendingTransition(R.anim.amin_in,0);
+
             }
         };
     }

@@ -49,7 +49,7 @@
             android:layout_marginLeft="20dp"
             />
     </LinearLayout>
-    <VideoView
+    <fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:id="@+id/answer_has_video_video"

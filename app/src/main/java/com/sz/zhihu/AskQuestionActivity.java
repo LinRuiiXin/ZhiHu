@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,8 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,7 +34,7 @@ import com.sz.zhihu.utils.PermissionUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.view.ChoiceTypeView;
 
 import java.io.File;
@@ -94,7 +91,7 @@ public class AskQuestionActivity extends AppCompatActivity implements View.OnCli
         video = findViewById(R.id.aq_button_video);
         questionDescribe.setPlaceholder("对问题补充说明，可以更快获得解答（选填）");
         serverLocation = getResources().getString(R.string.server_location);
-        user = UserUtils.queryUserHistory();
+        user = DBUtils.queryUserHistory();
         gson = new Gson();
         back.setOnClickListener(this);
         choiceType.setOnClickListener(this);

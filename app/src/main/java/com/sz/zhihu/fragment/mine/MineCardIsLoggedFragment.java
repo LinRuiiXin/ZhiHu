@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,13 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.sz.zhihu.BrowseActivity;
 import com.sz.zhihu.HomePageActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.interfaces.CustomFragmentFunction;
 import com.sz.zhihu.po.User;
-import com.sz.zhihu.utils.UserUtils;
-
-import org.w3c.dom.Text;
+import com.sz.zhihu.utils.DBUtils;
 
 public class MineCardIsLoggedFragment extends Fragment implements CustomFragmentFunction {
     private User user;
@@ -34,6 +34,9 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
     private TextView careNum;
     private TextView collectNum;
     private TextView historyNum;
+    private RelativeLayout care;
+    private RelativeLayout collect;
+    private RelativeLayout browse;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -48,7 +51,7 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(view == null){
             view = inflater.inflate(R.layout.fragment_mine_card_logged, container, false);
-            user = UserUtils.queryUserHistory();
+            user = DBUtils.queryUserHistory();
             if(user != null){
                 init();
             }
@@ -64,6 +67,9 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
         careNum = view.findViewById(R.id.mine_card_il_care_num);
         collectNum = view.findViewById(R.id.mine_card_il_collect_num);
         historyNum = view.findViewById(R.id.mine_card_il_history_num);
+        care = view.findViewById(R.id.mine_card_il_care_rl);
+        collect = view.findViewById(R.id.mine_card_il_collect_rl);
+        browse = view.findViewById(R.id.mine_card_il_browse_rl);
         String portraitFileName = user.getPortraitFileName();
         if(portraitFileName != null) {
             String url = serverLocation + "/res/User/" + user.getUserId() + "/" + portraitFileName;
@@ -72,8 +78,18 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
             Glide.with(getContext()).load(R.drawable.default_portrait).into(portrait);
         }
         userName.setText(user.getUserName());
+        int browseRecordCount = DBUtils.getBrowseRecordCount();
+        careNum.setText(String.valueOf(user.getFollowSum()));
+        collectNum.setText(String.valueOf(user.getCollectSum()));
+        historyNum.setText(String.valueOf(browseRecordCount));
         personalPage.setOnClickListener(v->{
             Intent intent = new Intent(activity,HomePageActivity.class);
+            activity.startActivity(intent);
+        });
+        care.setOnClickListener(v->{});
+        collect.setOnClickListener(v->{});
+        browse.setOnClickListener(v->{
+            Intent intent = new Intent(activity, BrowseActivity.class);
             activity.startActivity(intent);
         });
     }

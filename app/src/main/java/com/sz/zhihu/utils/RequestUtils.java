@@ -25,11 +25,15 @@ public class RequestUtils {
      * 传入服务器接口，回调接口实现(Get提交)
      */
     public static void sendSimpleRequest(String url, Callback callback){
-        OkHttpClient httpClient = new OkHttpClient();
         Request.Builder builder = new Request.Builder().url(url).method("GET", null).addHeader("acceptType","application/json");
         Request request = builder.build();
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
+    }
+    public static void sendSimpleRequest(String url){
+        Request.Builder builder = new Request.Builder().url(url).method("GET", null).addHeader("acceptType","application/json");
+        Request request = builder.build();
+        httpClient.newCall(request);
     }
     /*
     * JSON方式提交数据

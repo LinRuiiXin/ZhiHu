@@ -1,18 +1,19 @@
 package com.sz.zhihu.utils;
 
 import android.app.Activity;
-import android.app.Dialog;
 
 import com.sz.zhihu.po.User;
+import com.sz.zhihu.vo.RecommendViewBean;
 
-import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
-public class UserUtils {
+import java.util.List;
+
+public class DBUtils {
     private static User user;
     public static User queryUserHistory(){
         if(user == null){
-            synchronized (UserUtils.class){
+            synchronized (DBUtils.class){
                 if(user == null){
                     user = DataSupport.findFirst(User.class);
                 }
@@ -27,5 +28,13 @@ public class UserUtils {
             DiaLogUtils.showPromptLoginDialog(activity);
             return false;
         }
+    }
+    public static int getBrowseRecordCount(){
+        int count = DataSupport.count(RecommendViewBean.class);
+        return count;
+    }
+    public static List<RecommendViewBean> getBrowseRecord(int index){
+        List<RecommendViewBean> recommendViewBeans = DataSupport.order("id desc").limit(10).offset(index).find(RecommendViewBean.class);
+        return recommendViewBeans;
     }
 }

@@ -4,7 +4,6 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:src="@drawable/icon_down"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/iv_down"
@@ -32,9 +31,11 @@
             android:layout_height="40dp"
             android:padding="8dp"
             android:id="@+id/add_days"
-            android:text="今天是你加入知乎的第1天"
+            android:text="今天是你加入ZhiHu的第1天"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="13sp"
+            android:gravity="center_horizontal|center_vertical"
+            />
     </LinearLayout>
     <RelativeLayout
         android:layout_width="wrap_content"

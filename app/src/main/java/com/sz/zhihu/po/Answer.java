@@ -10,6 +10,7 @@ public class Answer {
     private Long userId;
     private String content;
     private Integer contentType;
+    private String thumbnail;
     private Long supportSum;
     private Long commentSum;
     private Date time;
@@ -68,6 +69,14 @@ public class Answer {
         this.contentType = contentType;
     }
 
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
+    }
+
     public Long getSupportSum() {
         return supportSum;
     }
@@ -100,6 +109,7 @@ public class Answer {
                 ", userId=" + userId +
                 ", content='" + content + '\'' +
                 ", contentType=" + contentType +
+                ", thumbnail='" + thumbnail + '\'' +
                 ", supportSum=" + supportSum +
                 ", commentSum=" + commentSum +
                 ", time=" + time +

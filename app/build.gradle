@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.sz.zhihu"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -43,6 +43,8 @@ dependencies {
     implementation 'com.squareup.okio:okio:1.12.0'
     // litepal数据库
     implementation 'org.litepal.android:core:1.6.1'
-
     implementation 'com.github.RexSuper:RichEditor:1.0.3'
+    implementation 'fm.jiecao:jiecaovideoplayer:5.5.2'
+//    compile 'com.elmargomez.typer:typerlib:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 }

@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.sz.zhihu.LoginActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.po.User;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 
 public class MessageFragment extends Fragment {
     private View viewLogged = null;
@@ -32,7 +32,7 @@ public class MessageFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        User user = UserUtils.queryUserHistory();
+        User user = DBUtils.queryUserHistory();
         if(user == null){
             View view =  inflater.inflate(R.layout.fragment_msg_have_not_logged,container,false);
             TextView prompt = view.findViewById(R.id.fragment_msg_hnl_prompt);

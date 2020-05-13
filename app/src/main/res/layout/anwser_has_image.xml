@@ -79,6 +79,7 @@
             android:layout_width="0dp"
             android:layout_weight="1.3"
             android:layout_height="match_parent"
+            android:scaleType="centerCrop"
             android:id="@+id/answer_has_image_image"
             android:background="@drawable/card_image_shape"
             />

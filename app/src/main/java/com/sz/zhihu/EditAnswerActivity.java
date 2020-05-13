@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -32,7 +31,7 @@ import com.sz.zhihu.utils.PermissionUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
-import com.sz.zhihu.utils.UserUtils;
+import com.sz.zhihu.utils.DBUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +43,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 
-public class EditActivity extends AppCompatActivity implements View.OnClickListener {
+public class EditAnswerActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView question;
     private Button commit;
@@ -74,7 +73,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
 
     private void init() {
         questionBean = (Question) getIntent().getSerializableExtra("question");
-        user = UserUtils.queryUserHistory();
+        user = DBUtils.queryUserHistory();
         this.question = findViewById(R.id.edit_question);
         commit = findViewById(R.id.edit_button_commit);
         editText = findViewById(R.id.edit_edit_text);
@@ -89,6 +88,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         gson = new Gson();
         question.setText(questionBean.getName());
         editText.setPlaceholder("详细描述你的知识、经验或见解吧~");
+        editText.setNeedSetNewLineAfter(true);
         setListener();
     }
 
@@ -182,7 +182,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                                 RequestUtils.sendSingleFile(file, url, "image", new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
-                                        runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                        runOnUiThread(()->Toast.makeText(EditAnswerActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
                                     }
 
                                     @Override
@@ -193,7 +193,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                                                 String url = serverLocation + "/res/Image/" + simpleDto.getMsg();
                                                 editText.insertImage(url);
                                             }else{
-                                                Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(EditAnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }
@@ -221,7 +221,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                                 RequestUtils.sendSingleFile(file, url, "video", new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
-                                        runOnUiThread(()->Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                        runOnUiThread(()->Toast.makeText(EditAnswerActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
                                     }
 
                                     @Override
@@ -232,7 +232,7 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                                                 String url = serverLocation + "/res/Video/" + simpleDto.getMsg();
                                                 editText.insertVideo(url);
                                             }else{
-                                                Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(EditAnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }
@@ -266,14 +266,17 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         map.put("questionId",String.valueOf(questionBean.getId()));
         map.put("userId",String.valueOf(user.getUserId()));
         map.put("contentType",String.valueOf(contentType));
-        map.put("content",(HtmlUtils.getContentFromHtml(html)).substring(0,30));
+        String contentFromHtml = HtmlUtils.getContentFromHtml(html);
+        int length = contentFromHtml.length();
+        map.put("content",contentFromHtml.substring(0,length <= 52 ? length : 52));
+        map.put("thumbnail",getResUrl(contentType,html));
         File temporaryText = FileUtils.getTemporaryText(html);
         if(temporaryText.exists()){
             RequestUtils.sendFileWithParam(temporaryText, url, "answer", map, new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     runOnUiThread(()->{
-                        Toast.makeText(EditActivity.this,"上传失败",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditAnswerActivity.this,"上传失败",Toast.LENGTH_SHORT).show();
                         commit.setEnabled(true);
                     });
                 }
@@ -283,10 +286,10 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
                     SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
                     runOnUiThread(()->{
                         if(simpleDto.isSuccess()){
-                            Toast.makeText(EditActivity.this,"回答成功",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditAnswerActivity.this,"回答成功",Toast.LENGTH_SHORT).show();
                             finish();
                         }else{
-                            Toast.makeText(EditActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditAnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
                             commit.setEnabled(true);
                         }
                     });
@@ -295,6 +298,25 @@ public class EditActivity extends AppCompatActivity implements View.OnClickListe
         }else{
             Toast.makeText(this,"上传失败",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private String getResUrl(Integer contentType, String contentFromHtml) {
+        String resUrl = "";
+        if(contentType.equals(HtmlUtils.TYPE_ALL_TEXT)){
+            resUrl = "";
+        }else if(contentType.equals(HtmlUtils.TYPE_HAS_IMAGE)){
+            String imgFromHtml = HtmlUtils.getImgFromHtml(contentFromHtml);
+            resUrl = getProcessUrl(imgFromHtml);
+        }else if(contentType.equals(HtmlUtils.TYPE_HAS_VIDEO)){
+            String videoFromHtml = HtmlUtils.getVideoFromHtml(contentFromHtml);
+            resUrl = getProcessUrl(videoFromHtml);
+        }
+        return resUrl;
+    }
+
+    private String getProcessUrl(String resUrl) {
+        String [] sp = resUrl.split("/");
+        return sp[(sp.length)-1];
     }
 
     private void getBitMapFromPhotoAlbum() {
