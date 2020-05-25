@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <com.sz.zhihu.ScrollLayout
+        <com.sz.zhihu.compoent.ScrollLayout
             android:id="@+id/why"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -99,7 +99,7 @@
 
                 </LinearLayout>
             </ScrollView>
-        </com.sz.zhihu.ScrollLayout>
+        </com.sz.zhihu.compoent.ScrollLayout>
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"

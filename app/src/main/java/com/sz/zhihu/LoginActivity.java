@@ -28,7 +28,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AbstractCustomActivity {
 
     private TextView changeText;
     private EditText mail;

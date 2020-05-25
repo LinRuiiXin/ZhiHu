@@ -1,11 +1,11 @@
 package com.sz.zhihu;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.widget.ImageView;
 
-public class HomePageActivity extends AppCompatActivity {
+import com.sz.zhihu.compoent.ScrollLayout;
+
+public class HomePageActivity extends AbstractCustomActivity {
 
     private ImageView top;
     private ScrollLayout mScrollLayout;

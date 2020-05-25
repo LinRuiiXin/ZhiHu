@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class EditArticleActivity extends AppCompatActivity {
+public class EditArticleActivity extends AbstractCustomActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

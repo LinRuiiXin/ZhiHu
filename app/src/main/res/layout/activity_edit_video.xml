@@ -1,23 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#6E6E6E"
-    android:padding="15dp"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#000">
     <TextView
-        android:layout_width="50dp"
-        android:layout_height="3dp"
-        android:background="@drawable/icon_down"
-        android:layout_gravity="center_horizontal"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/aev_close"
+        android:background="@drawable/icon_close_activity_white"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#fff"
-        android:text="选择视频"
-        android:textSize="15dp"
-        android:layout_marginTop="10dp"
+        android:id="@+id/aev_get_video"
+        android:padding="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:textColor="@color/ZhiHuBlue"
+        android:text="选取视频"
+        android:layout_marginTop="7dp"
         />
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        >
+        <EditText
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:hint="我发布了一个视频，快来看看吧！"
+            android:textColor="#DADADA"
+            android:textColorHint="#DADADA"
+            android:maxLines="1"
+            android:background="@null"
+            />
+    </LinearLayout>
+</RelativeLayout>

@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.transition.Explode;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -24,7 +25,7 @@ import com.sz.zhihu.utils.SystemUtils;
 /*
 * 主活动，控制应用五个模块的跳转
 * */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AbstractCustomActivity {
 
     private BottomNavigationView bottomTabs;
     private IndexFragment indexFragment;
@@ -47,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        //设置状态栏透明
-        SystemUtils.setStatusBarFullTransparent(this);
         //申请权限
         PermissionUtils.registerPerMission(this,Manifest.permission.INTERNET);
         //初始化碎片

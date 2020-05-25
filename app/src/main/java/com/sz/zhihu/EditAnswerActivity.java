@@ -43,7 +43,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 
-public class EditAnswerActivity extends AppCompatActivity implements View.OnClickListener {
+public class EditAnswerActivity extends AbstractCustomActivity implements View.OnClickListener {
 
     private TextView question;
     private Button commit;

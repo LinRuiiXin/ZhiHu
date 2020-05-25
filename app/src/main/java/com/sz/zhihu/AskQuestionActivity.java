@@ -49,7 +49,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 
-public class AskQuestionActivity extends AppCompatActivity implements View.OnClickListener {
+public class AskQuestionActivity extends AbstractCustomActivity implements View.OnClickListener {
 
     private TextView back;
     private TextView commit;

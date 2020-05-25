@@ -14,7 +14,7 @@ import com.sz.zhihu.utils.SystemUtils;
 
 import static com.sz.zhihu.R.id.article_tool_bar;
 
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AbstractCustomActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

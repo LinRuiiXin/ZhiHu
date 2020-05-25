@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 import com.sz.zhihu.fragment.register.FinishRegisterFragment;
 import com.sz.zhihu.fragment.register.MailFragment;
 import com.sz.zhihu.utils.SystemUtils;
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AbstractCustomActivity {
 
     private FragmentManager supportFragmentManager;
     private MailFragment mailFragment;

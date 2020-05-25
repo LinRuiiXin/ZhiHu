@@ -32,7 +32,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class RecommendQuestionActivity extends AppCompatActivity {
+public class RecommendQuestionActivity extends AbstractCustomActivity {
 
     private TextView close;
     private RecyclerView recyclerView;

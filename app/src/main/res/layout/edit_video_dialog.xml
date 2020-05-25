@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#6E6E6E"
-    android:padding="15dp"
+    android:layout_height="match_parent"
+    android:background="@drawable/edit_video_dialog_background"
     android:orientation="vertical">
     <TextView
-        android:layout_width="50dp"
+        android:layout_width="40dp"
         android:layout_height="3dp"
         android:background="@drawable/icon_down"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textColor="#fff"
         android:text="选择视频"
-        android:textSize="15dp"
+        android:textSize="13dp"
         android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textColor="#E1E1E1"
+        />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/evd_recyclerview"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="15dp"
         />
 </LinearLayout>

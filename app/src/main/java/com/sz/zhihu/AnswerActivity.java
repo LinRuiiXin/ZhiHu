@@ -33,7 +33,7 @@ import okhttp3.Response;
 
 import static com.sz.zhihu.R.id.answer_tool_bar;
 
-public class AnswerActivity extends AppCompatActivity {
+public class AnswerActivity extends AbstractCustomActivity {
 
     private ViewPager viewPager;
     private List<Fragment> fragments;

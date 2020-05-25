@@ -12,7 +12,7 @@ import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
 import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.utils.SystemUtils;
 
-public class BrowseActivity extends AppCompatActivity {
+public class BrowseActivity extends AbstractCustomActivity {
     private int RECYCLERVIEW_INDEX = 0;
     private RecyclerView recyclerView;
     private RecommendRecyclerViewAdapter adapter;

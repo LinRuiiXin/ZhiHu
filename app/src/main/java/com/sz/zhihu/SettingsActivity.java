@@ -17,7 +17,7 @@ import com.sz.zhihu.utils.SystemUtils;
 
 import java.util.List;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AbstractCustomActivity {
 
     private Toolbar toolbar;
     private RecyclerView recyclerView;

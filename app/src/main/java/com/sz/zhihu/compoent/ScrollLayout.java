@@ -1,4 +1,4 @@
-package com.sz.zhihu;
+package com.sz.zhihu.compoent;
 
 import android.content.Context;
 import android.os.Build;

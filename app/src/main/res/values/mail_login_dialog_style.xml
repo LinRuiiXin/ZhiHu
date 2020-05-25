@@ -18,6 +18,8 @@
         <!-- 遮罩层 -->
         <item name="android:backgroundDimAmount">0.7</item>
     </style>
+    <style name="defDialogTheme" parent="@android:style/Theme.Dialog">
+    </style>
 
     <!-- dialog的动画 -->
     <style name="main_menu_animStyle">

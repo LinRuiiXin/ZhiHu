@@ -2,6 +2,7 @@ package com.sz.zhihu.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,6 +32,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.sz.zhihu.AnswerActivity;
 import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
+import com.sz.zhihu.SplashActivity;
 import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.security.MessageDigest;
