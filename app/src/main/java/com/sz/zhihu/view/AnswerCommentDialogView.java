@@ -5,11 +5,11 @@ import android.view.View;
 
 import com.sz.zhihu.R;
 
-public class EditVideoDialogView {
+public class AnswerCommentDialogView {
     private static View view;
     public static View getView(Activity activity){
         if(view == null){
-            view = View.inflate(activity,R.layout.edit_video_dialog,null);
+            view = View.inflate(activity, R.layout.answer_comment_dialog,null);
         }
         return view;
     }

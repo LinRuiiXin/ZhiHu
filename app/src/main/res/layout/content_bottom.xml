@@ -27,53 +27,69 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="70dp"
-        android:id="@+id/cb_collect"
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal"
         android:layout_centerVertical="true"
         >
-
-        <TextView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginLeft="2dp"
-            android:background="@drawable/icon_not_collect"
-            android:layout_marginTop="2dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="收藏"
-            android:gravity="center_horizontal"
-            android:textSize="10dp"
-            android:layout_marginLeft="2dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="25dp"
-        android:id="@+id/cb_comment"
-        android:layout_centerVertical="true"
-        >
-
-        <TextView
-            android:layout_width="18dp"
-            android:layout_height="17dp"
-            android:background="@drawable/icon_comment_out"
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="1dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="评论"
-            android:gravity="center_horizontal"
-            android:textSize="10dp"
-            android:layout_marginTop="1dp"
-            />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/cb_collect"
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/icon_not_collect"
+                android:layout_gravity="center_horizontal"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="收藏"
+                android:textSize="10dp"
+                android:layout_gravity="center_horizontal"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:id="@+id/cb_comment"
+            >
+            <ImageView
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:background="@drawable/icon_comment_out"
+                android:layout_gravity="center_horizontal"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="评论"
+                android:textSize="10dp"
+                android:layout_gravity="center_horizontal"
+                />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

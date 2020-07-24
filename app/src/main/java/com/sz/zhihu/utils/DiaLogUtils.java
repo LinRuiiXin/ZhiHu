@@ -61,7 +61,7 @@ public class DiaLogUtils {
         final Dialog dialog = new PromptLoginDialog(activity,R.style.DialogTheme);
         View promptView = PromptLoginView.getPromptView(activity);
         dialog.setContentView(promptView);
-        Window window = dialog.getWindow();
+//        Window window = dialog.getWindow();
 //        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.setOnDismissListener(d -> {
             ((ViewGroup)promptView.getParent()).removeView(promptView);
@@ -94,7 +94,7 @@ public class DiaLogUtils {
     public static void showGitHubLocation(Activity activity){
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setTitle("GitHub地址")
-                .setMessage("客户端：\ngithub.com/LinRuiiXin/ZhiHu \n\n服务端：\ngithub.com/LinRuiiXin/ZhiHuServer\n\n欢迎给star!")
+                .setMessage("客户端：\ngithub.com/LinRuiiXin/ZhiHu \n\n服务端：\ngithub.com/LinRuiiXin/ZhiHuServer\n\n欢迎star!")
                 .setPositiveButton("确定", (d, w) -> {}).create();
         alertDialog.show();
     }

@@ -118,7 +118,6 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
-
                 Glide.with(context).load(serverLocation + "/res/Image/" + cardViewBean.getThumbnail()).apply(getOptions()).into(viewHolder.image);
                 viewHolder.support.setText(cardViewBean.getSupportSum() + "赞同");
                 viewHolder.setOnClickListener(cardViewBean);

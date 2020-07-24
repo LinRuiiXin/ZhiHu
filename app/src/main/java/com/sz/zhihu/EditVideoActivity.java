@@ -9,17 +9,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.loadmore.LoadMoreView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.sz.zhihu.adapter.EditVideoDialogAdapter;
@@ -37,15 +43,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
+
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class EditVideoActivity extends AbstractCustomActivity {
-
+    private final int DATA_SIZE = 20;
+    private int DATA_START = 0;
     private RecyclerView recyclerView;
     private BottomSheetDialog dialog;
     private BottomSheetBehavior<View> behavior;
     private View view;
     private TextView close;
     private TextView getVideo;
+    private EditVideoDialogAdapter adapter;
+    private VideoMedia choiceMedia;
+    private LoadMoreView loadMoreView = new LoadMoreView() {
+        @Override
+        public int getLayoutId() {
+            return 0;
+        }
+
+        @Override
+        protected int getLoadingViewId() {
+            return 0;
+        }
+
+        @Override
+        protected int getLoadFailViewId() {
+            return 0;
+        }
+
+        @Override
+        protected int getLoadEndViewId() {
+            return 0;
+        }
+    };
+    private JCVideoPlayerStandard video;
+    private EditText title;
+    private RelativeLayout submitButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +93,35 @@ public class EditVideoActivity extends AbstractCustomActivity {
         showBottomDialog();
         close = findViewById(R.id.aev_close);
         getVideo = findViewById(R.id.aev_get_video);
+        submitButton = findViewById(R.id.aev_submit_button);
+        title = findViewById(R.id.aev_title);
+        title.clearFocus();
+        video = findViewById(R.id.aev_video);
+        video.backButton.setVisibility(View.GONE);
+        video.tinyBackImageView.setVisibility(View.GONE);
         setListeners();
     }
 
     private void setListeners() {
         close.setOnClickListener(v->finish());
         getVideo.setOnClickListener(v->dialog.show());
+        submitButton.setOnClickListener(v->{
+            String titleStr = title.getText().toString();
+            if(!TextUtils.isEmpty(titleStr)){
+                if(choiceMedia != null){
+                    File file = new File(choiceMedia.getPath());
+                    if(file.length() <= 15728640){
+
+                    }else{
+                        Toast.makeText(EditVideoActivity.this,"视频大小不能超过15MB，请重新选择",Toast.LENGTH_SHORT).show();
+                        dialog.show();
+                    }
+                }else
+                    dialog.show();
+            }else
+                Toast.makeText(EditVideoActivity.this,"请输入标题",Toast.LENGTH_SHORT).show();
+
+        });
     }
 
     private void showBottomDialog() {
@@ -108,19 +166,51 @@ public class EditVideoActivity extends AbstractCustomActivity {
     }
 
     private void bindData() {
-        Map<String, List<VideoMedia>> videoMedias = getVideoMedia(0,20);
+        List<VideoMedia> allData = getData();
+        adapter = new EditVideoDialogAdapter(this, allData);
+        if(allData.size()<20){
+            adapter.loadMoreEnd();
+            adapter.setLoadMoreView(loadMoreView);
+        }
+        adapter.setOnLoadMoreListener(()->{
+            List<VideoMedia> data = getData();
+            adapter.addData(data);
+            adapter.loadMoreComplete();
+            if(data.size()<20){
+                adapter.loadMoreEnd();
+                adapter.setLoadMoreView(loadMoreView);
+            }
+        },recyclerView);
+        adapter.setOnItemClickListener((adapter,view,position)->{
+            VideoMedia videoMedia = (VideoMedia) adapter.getData().get(position);
+            String path = videoMedia.getPath();
+            if((new File(path).length()) > 15728640){
+                Toast.makeText(EditVideoActivity.this,"视频大小不能超过15MB",Toast.LENGTH_SHORT).show();
+                return;
+            }
+            video.setUp(path,JCVideoPlayerStandard.SCREEN_LAYOUT_NORMAL);
+            video.thumbImageView.setImageBitmap(BitmapFactory.decodeFile(videoMedia.getThumbPath()));
+            video.setVisibility(View.VISIBLE);
+            dialog.dismiss();
+            this.choiceMedia = videoMedia;
+        });
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(this,3));
+    }
+
+    private List<VideoMedia> getData() {
+        Map<String, List<VideoMedia>> videoMedias = getVideoMedia(DATA_START,DATA_SIZE);
         Set<String> strings = videoMedias.keySet();
         List<VideoMedia> allData = new ArrayList<>();
         strings.forEach(s -> {
             List<VideoMedia> videoMediaList = videoMedias.get(s);
             videoMediaList.forEach(allData::add);
         });
-        EditVideoDialogAdapter editVideoDialogAdapter = new EditVideoDialogAdapter(this, allData);
-        recyclerView.setAdapter(editVideoDialogAdapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,3));
+        return allData;
     }
 
     private Map<String, List<VideoMedia>> getVideoMedia(int start,int count) {
+        int end = start + count;
         Map<String,List<VideoMedia>> data = new HashMap<>();
         Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         String[] proj = { MediaStore.Video.Thumbnails._ID
@@ -131,7 +221,7 @@ public class EditVideoActivity extends AbstractCustomActivity {
                 ,MediaStore.Video.Media.DATE_MODIFIED};
         Cursor cursor = getContentResolver().query(uri, proj, MediaStore.Video.Media.MIME_TYPE + "=?",
                 new String[]{"video/mp4"},
-                MediaStore.Video.Media.DATE_MODIFIED + " desc limit " + start + " , " + count);
+                MediaStore.Video.Media.DATE_MODIFIED + " desc limit " + start + " , " + end);
         if(cursor != null){
             while (cursor.moveToNext()){
                 int videoId = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media._ID));
@@ -172,6 +262,7 @@ public class EditVideoActivity extends AbstractCustomActivity {
             }
             cursor.close();
         }
+        DATA_START += count;
         return data;
     }
 
