@@ -1,85 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="20dp"
-    android:orientation="horizontal"
-    >
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:id="@+id/acoi_portrait"
-        />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="15dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:orientation="horizontal"
+        android:id="@+id/acoi_linear"
         >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/acoi_username"
-            android:textColor="@color/black"
-            android:text="LinRuiXin"
-            android:textSize="14sp"
-            android:textStyle="bold"
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:id="@+id/acoi_portrait"
+            app:riv_oval="true"
             />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/acoi_content"
-            android:text="黑客与画家：程序应该是一边写一边明白他是怎么实现的,而不是一开始完全都设计好。"
-            android:textColor="@color/black"
-            android:layout_marginTop="5dp"
-            />
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
+            android:layout_marginLeft="15dp"
             >
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/acoi_date"
-                android:text="周一  05:43"
+                android:id="@+id/acoi_username"
+                android:textColor="@color/black"
+                android:text="LinRuiXin"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/acoi_date"
-                android:id="@+id/acoi_point"
-                android:text=" · "
+                android:id="@+id/acoi_content"
+                android:text="黑客与画家：程序应该是一边写一边明白他是怎么实现的,而不是一开始完全都设计好。"
+                android:textColor="@color/black"
+                android:layout_marginTop="5dp"
                 />
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/acoi_view_reply"
-                android:text="查看回复"
-                android:layout_toRightOf="@id/acoi_point"
-                />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal"
-                android:layout_alignParentRight="true"
                 >
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/acoi_support_sum"
-                    android:text="247"
-                    android:layout_marginRight="8dp"
+                    android:id="@+id/acoi_date"
+                    android:text="周一  05:43"
+                    android:textSize="10dp"
                     />
-                <ImageView
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:id="@+id/acoi_support_icon"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/icon_support_gray"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/acoi_date"
+                    android:id="@+id/acoi_point"
+                    android:text=" · "
+                    android:textSize="10dp"
                     />
-            </LinearLayout>
-        </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/acoi_view_reply"
+                    android:text="查看回复"
+                    android:textSize="10dp"
+                    android:layout_toRightOf="@id/acoi_point"
+                    />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentRight="true"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/acoi_support_sum"
+                        android:text="247"
+                        android:textSize="10dp"
+                        android:layout_marginRight="8dp"
+                        />
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:id="@+id/acoi_support_icon"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/icon_support_gray"
+                        />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/ButtonDefaultColor"
+        android:layout_below="@+id/acoi_linear"
+        />
+</RelativeLayout>

@@ -29,13 +29,33 @@
             android:textSize="17dp" />
     </RelativeLayout>
 
-    <FrameLayout
+    <!--<FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         android:layout_below="@id/acd_line1"
         android:id="@+id/acd_main"
-        />
+        />-->
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/acd_swipeRefreshLayout"
+        android:layout_marginBottom="50dp"
+        android:layout_below="@id/acd_line1"
+        >
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/acd_recyclerview_level_one"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/acd_recyclerview_level_two"
+            android:visibility="gone"
+            />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

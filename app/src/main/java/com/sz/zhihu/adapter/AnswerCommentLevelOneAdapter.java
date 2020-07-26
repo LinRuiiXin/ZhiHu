@@ -16,6 +16,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.sz.zhihu.R;
 import com.sz.zhihu.po.AnswerCommentLevelOne;
 import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.DateProcessor;
 import com.sz.zhihu.vo.AnswerCommentLevelOneVo;
 import java.util.Date;
 import java.util.List;
@@ -26,11 +27,15 @@ public class AnswerCommentLevelOneAdapter extends RecyclerView.Adapter {
     private List<AnswerCommentLevelOneVo> data;
     private Context context;
     private final String serverLocation;
+    private Runnable runnable;
+    private final DateProcessor dateProcessor;
 
-    public AnswerCommentLevelOneAdapter(Context context, List<AnswerCommentLevelOneVo> data){
+    public AnswerCommentLevelOneAdapter(Context context, List<AnswerCommentLevelOneVo> data,Runnable runnable){
         inflater = LayoutInflater.from(context);
         this.context = context;
         this.data = data;
+        this.runnable = runnable;
+        dateProcessor = DateProcessor.getInstance();
         serverLocation = context.getString(R.string.server_location);
     }
 
@@ -51,7 +56,7 @@ public class AnswerCommentLevelOneAdapter extends RecyclerView.Adapter {
             Glide.with(context).load(portraitUrl).into(viewHolder.portrait);
             viewHolder.userName.setText(user.getUserName());
             viewHolder.content.setText(commentLevelOne.getContent());
-            viewHolder.date.setText(transDate(commentLevelOne.getTime()));
+            viewHolder.date.setText(dateProcessor.processorDate(commentLevelOne.getTime()));
             viewHolder.point.setVisibility(commentLevelOne.getHasReply() == 0 ? View.GONE : View.VISIBLE);
             viewHolder.viewReply.setVisibility(commentLevelOne.getHasReply() == 0 ? View.GONE : View.VISIBLE);
             viewHolder.supportSum.setText(String.valueOf(commentLevelOne.getSupportSum()));
@@ -62,9 +67,6 @@ public class AnswerCommentLevelOneAdapter extends RecyclerView.Adapter {
         }
     }
 
-    private String transDate(Date time) {
-        return "0";
-    }
 
     @Override
     public int getItemCount() {

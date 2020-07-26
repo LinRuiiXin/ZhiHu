@@ -6,6 +6,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import android.graphics.Color;
@@ -14,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,10 +29,12 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sz.zhihu.adapter.AnswerCommentLevelOneAdapter;
 import com.sz.zhihu.adapter.AnswerFragmentAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.fragment.comment.AnswerCommentLevelOneFragment;
 import com.sz.zhihu.fragment.answer.AnswerFragment;
+import com.sz.zhihu.holder.CommentHolder;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.SystemUtils;
@@ -47,6 +53,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 import static com.sz.zhihu.R.id.answer_tool_bar;
+import static com.sz.zhihu.R.id.container;
 
 public class AnswerActivity extends AbstractCustomActivity {
 
@@ -69,6 +76,13 @@ public class AnswerActivity extends AbstractCustomActivity {
     private boolean isCommentLoading = false;
     private FragmentManager supportFragmentManager;
     private AnswerCommentLevelOneFragment levelOneFragment;
+    private CommentHolder commentHolder;
+    private SwipeRefreshLayout refreshLayout;
+    private RecyclerView level1;
+    private RecyclerView level2;
+    private List<AnswerCommentLevelOneVo> answerCommentLevelOneVos;
+    private AnswerCommentLevelOneAdapter commentLevel1Adapter;
+    private LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +93,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     }
 
     private void init() {
+        linearLayoutManager = new LinearLayoutManager(AnswerActivity.this);
         toolbarLayout = findViewById(R.id.aa_tool_bar_layout);
         toolbar = findViewById(answer_tool_bar);
         viewPager = findViewById(R.id.answer_view_pager);
@@ -90,29 +105,91 @@ public class AnswerActivity extends AbstractCustomActivity {
         fragments = new ArrayList<>();
         gson = new GsonBuilder().disableHtmlEscaping().create();
         this.user = DBUtils.queryUserHistory();
-        supportFragmentManager = getSupportFragmentManager();
+        commentHolder = new CommentHolder();
         initCommentDialog();
         recordBrowse();
         initToolBar();
         initViewPager();
         comment.setOnClickListener(v->{
+            if(!commentHolder.isLoad()){
+                answerCommentLevelOneVos = new ArrayList<>();
+                commentLevel1Adapter = new AnswerCommentLevelOneAdapter(AnswerActivity.this, answerCommentLevelOneVos,()->{});
+                level1.setAdapter(commentLevel1Adapter);
+                level1.setLayoutManager(linearLayoutManager);
+                getCommentLevelOne();
+            }
             dialog.show();
-            if(!isCommentLoading){
-                levelOneFragment = new AnswerCommentLevelOneFragment(serverLocation,getAnswerId(), user.getUserId(),()->{
+        });
+    }
 
+
+    /*
+     * 获取当前回答评论数据
+     * */
+    private void getCommentLevelOne() {
+        refreshLayout.setRefreshing(true);
+        String url = serverLocation + "/Comment/LevelOne/"+getAnswerId()+"/"+user.getId()+"/"+commentHolder.getLimit();
+        RequestUtils.sendSimpleRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(AnswerActivity.this,"服务器繁忙",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        Object object = simpleDto.getObject();
+                        List list = gson.fromJson(gson.toJson(object), List.class);
+                        List<AnswerCommentLevelOneVo> res = new ArrayList<>(list.size());
+                        for(Object o : list){
+                            res.add(gson.fromJson(gson.toJson(o),AnswerCommentLevelOneVo.class));
+                        }
+                        loadCommentLevelOneFinish(res);
+                    }
                 });
-                supportFragmentManager.beginTransaction().replace(R.id.acd_main,levelOneFragment).commit();
-                isCommentLoading = true;
             }
         });
     }
 
+    /*
+    * 一级评论加载完成后回调此方法
+    *
+    * */
+
+    private void loadCommentLevelOneFinish(List<AnswerCommentLevelOneVo> res) {
+        if (!commentHolder.isLoad()){
+            commentHolder.setLoad(true);
+            level1.setVisibility(View.VISIBLE);
+            level2.setVisibility(View.GONE);
+        }
+        refreshLayout.setRefreshing(false);
+        if(res.size() == 0 || res.size() < 10){
+            Toast.makeText(AnswerActivity.this,"没有更多了", Toast.LENGTH_SHORT).show();
+        }
+        if(res.size() == 0) return;
+        commentHolder.addLimit(res.size());
+        answerCommentLevelOneVos.addAll(res);
+        commentLevel1Adapter.notifyDataSetChanged();
+    }
+
+    private void clearComment(){
+        commentHolder.clear();
+        level1.setVisibility(View.GONE);
+        level2.setVisibility(View.GONE);
+        answerCommentLevelOneVos.clear();
+    }
 
     /*
      * 初始化评论提示框
      * */
     private void initCommentDialog() {
         dialogView = AnswerCommentDialogView.getView(this);
+        refreshLayout = dialogView.findViewById(R.id.acd_swipeRefreshLayout);
+        refreshLayout.setEnabled(false);
+        level1 = dialogView.findViewById(R.id.acd_recyclerview_level_one);
+        level2 = dialogView.findViewById(R.id.acd_recyclerview_level_two);
         dialog = new BottomSheetDialog(this);
         dialog.setContentView(dialogView);
         dialog.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -288,6 +365,7 @@ public class AnswerActivity extends AbstractCustomActivity {
 
     @Override
     protected void onDestroy() {
+        dialog.dismiss();
         ((ViewGroup)dialogView.getParent()).removeView(dialogView);
         super.onDestroy();
     }

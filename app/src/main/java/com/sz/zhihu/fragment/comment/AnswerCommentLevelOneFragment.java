@@ -70,7 +70,7 @@ public class AnswerCommentLevelOneFragment extends Fragment {
     }
 
     private void initData() {
-        adapter = new AnswerCommentLevelOneAdapter(context, data);
+        adapter = new AnswerCommentLevelOneAdapter(context, data,()->{});
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         getCommentLevelOne();
