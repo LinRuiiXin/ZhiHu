@@ -29,7 +29,7 @@
                 <include layout="@layout/top_bar_layout"/>
             </com.google.android.material.appbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
-        <com.sz.zhihu.compoent.RichEditor
+        <com.rex.editor.view.RichEditorNew
             android:id="@+id/fa_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp"
+    android:clickable="true"
+    android:background="@drawable/card_ripple"
     >
     <com.makeramen.roundedimageview.RoundedImageView
         android:layout_width="40dp"
@@ -27,6 +29,8 @@
         android:layout_below="@+id/loi_user_name"
         android:layout_alignLeft="@+id/loi_user_name"
         android:layout_marginTop="12dp"
+        android:textSize="12dp"
+        android:textColor="#535353"
         android:text="面试作品得根据影评的岗位来写。中层及以下的岗位不用写战略发展。"
         />
     <LinearLayout

@@ -66,6 +66,7 @@ public class AnswerFragment extends Fragment {
 
     private void bindData() {
         content.loadRichEditorCode(answerVo.getAnswer().getContent());
+        content.setClickable(false );
         User user = answerVo.getUser();
         String resUrl = serverLocation + "/res/User/" + user.getId() + "/" + user.getPortraitFileName();
         Glide.with(activity).load(resUrl).into(portrait);

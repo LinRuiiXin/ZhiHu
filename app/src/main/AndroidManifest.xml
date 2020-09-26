@@ -15,11 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EditVideoActivity"></activity>
-        <activity android:name=".EditArticleActivity" />
+        <activity android:name=".EditVideoActivity" />
+        <activity android:name=".EditArticleActivity">
+        </activity>
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".BrowseActivity" />
-        <activity android:name=".AnswerActivity" />
+        <activity android:name=".BrowseActivity"></activity>
+        <activity
+            android:name=".AnswerActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".ArticleActivity" />
         <activity android:name=".RecommendQuestionActivity" />
         <activity android:name=".AskQuestionActivity" />
@@ -28,16 +31,14 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".EditAnswerActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize" />
-        <activity android:name=".LoginActivity" />
+            android:windowSoftInputMode="stateVisible|adjustResize"></activity>
+        <activity android:name=".LoginActivity"></activity>
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity" />
+            </intent-filter></activity>
+        <activity android:name=".MainActivity"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"

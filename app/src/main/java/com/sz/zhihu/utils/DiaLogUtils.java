@@ -37,8 +37,8 @@ import okhttp3.Response;
 
 public class DiaLogUtils {
 
-    private static String serverLocation;
-    private static Gson gson = new Gson();
+//    private static String serverLocation;
+//    private static Gson gson = new Gson();
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void MailLoginDiaLog(Activity activity){
         final Dialog dialog = new MailLoginDialog(activity, R.style.DialogTheme);

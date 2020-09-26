@@ -2,16 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/answer_comment_background"
-    android:paddingLeft="20dp"
-    android:paddingTop="20dp"
-    android:paddingRight="20dp">
+    android:background="@drawable/answer_comment_background">
 
     <RelativeLayout
         android:id="@+id/acd_line1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="10dp">
 
         <TextView
             android:id="@+id/acd_close"
@@ -43,32 +44,47 @@
         android:id="@+id/acd_swipeRefreshLayout"
         android:layout_marginBottom="50dp"
         android:layout_below="@id/acd_line1"
+        android:background="#EFEFEF"
         >
-        <androidx.recyclerview.widget.RecyclerView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/acd_recyclerview_level_one"
-            />
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/acd_recyclerview_level_two"
-            android:visibility="gone"
-            />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/acd_recyclerview_level_one"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/acd_recyclerview_level_two"
+                android:visibility="gone"
+                />
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_alignParentBottom="true">
-
+        android:layout_alignParentBottom="true"
+        android:background="#F8F8F8"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:background="#CFCFCF"
+            />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:layout_marginTop="10dp"
+            >
 
-            <EditText
+            <TextView
                 android:id="@+id/acd_write_comment"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -77,7 +93,8 @@
                 android:gravity="center_vertical"
                 android:hint="评论千万条，友善第一条"
                 android:paddingLeft="15dp"
-                android:textSize="10dp" />
+                android:textSize="10dp"
+                />
 
             <TextView
                 android:layout_width="0dp"

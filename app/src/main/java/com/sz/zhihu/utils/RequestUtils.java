@@ -1,7 +1,6 @@
 package com.sz.zhihu.utils;
 
 import android.os.Build;
-import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
 
@@ -30,6 +29,7 @@ public class RequestUtils {
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
     }
+
     public static void sendSimpleRequest(String url){
         Request.Builder builder = new Request.Builder().url(url).method("GET", null).addHeader("acceptType","application/json");
         Request request = builder.build();
@@ -86,6 +86,7 @@ public class RequestUtils {
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
     }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void deleteWithParams(String url, Map<String,String> params, Callback callback){
         MultipartBody.Builder builder = new MultipartBody.Builder()
@@ -98,5 +99,6 @@ public class RequestUtils {
         Call call = httpClient.newCall(request);
         call.enqueue(callback);
     }
+
 
 }
