@@ -109,6 +109,13 @@ public class AnswerActivity extends AbstractCustomActivity {
     private RelativeLayout optionReply;
     private RelativeLayout optionDelete;
 
+    public AnswerActivity(){
+        fragments = new ArrayList<>();
+        gson = new Gson();
+        this.user = DBUtils.queryUserHistory();
+        commentHolder = new CommentHolder();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,49 +127,37 @@ public class AnswerActivity extends AbstractCustomActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
-        prepareAndBindComponent();
+        prepare();
         initOptionDialog();
         initReplyDialog();
         initCommentDialog();
         recordBrowse();
         initToolBar();
         initViewPager();
-        comment.setOnClickListener(v -> {
-            if (!commentHolder.isLoad()) {
-                answerCommentLevelOneVos = new ArrayList<>();
-                commentLevel1Adapter = new AnswerCommentLevelOneAdapter(AnswerActivity.this, answerCommentLevelOneVos, answerCommentLevelOneVo -> {
-                    lv1ToLv2 = answerCommentLevelOneVo;
-                    toCommentLevel2(answerCommentLevelOneVo.getCommentLevelOne().getId());
-                }, answerCommentLevelOneVo -> {
-                    showOptionDialog(answerCommentLevelOneVo);
-                });
-                level1.setAdapter(commentLevel1Adapter);
-                level1.setLayoutManager(linearLayoutManager);
-                getCommentLevelOne();
-            }
-            dialog.show();
-        });
+        comment.setOnClickListener(commentClickListener());
     }
+
+
 
     /*
     * 绑定组件与初始化所需实例
     * */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void prepareAndBindComponent() {
+    private void prepare() {
+        bindComponent();
         linearLayoutManager = new LinearLayoutManager(AnswerActivity.this);
+        viewBean = (RecommendViewBean) getIntent().getSerializableExtra("viewBean");
+        serverLocation = getResources().getString(R.string.server_location);
+        answerCommentLevelTwoAdapter = new AnswerCommentLevelTwoAdapter(this, commentLevelTwoVos, answerCommentLevelTwoVo -> showOptionDialog(answerCommentLevelTwoVo));
+    }
+
+    private void bindComponent() {
         toolbarLayout = findViewById(R.id.aa_tool_bar_layout);
         toolbar = findViewById(answer_tool_bar);
         viewPager = findViewById(R.id.answer_view_pager);
         support = findViewById(R.id.cb_support);
         collect = findViewById(R.id.cb_collect);
         comment = findViewById(R.id.cb_comment);
-        viewBean = (RecommendViewBean) getIntent().getSerializableExtra("viewBean");
-        serverLocation = getResources().getString(R.string.server_location);
-        fragments = new ArrayList<>();
-        gson = new Gson();
-        this.user = DBUtils.queryUserHistory();
-        commentHolder = new CommentHolder();
-        answerCommentLevelTwoAdapter = new AnswerCommentLevelTwoAdapter(this, commentLevelTwoVos, answerCommentLevelTwoVo -> showOptionDialog(answerCommentLevelTwoVo));
     }
 
     /*
@@ -263,7 +258,7 @@ public class AnswerActivity extends AbstractCustomActivity {
             if (answerCommentLevelOneVo.isSupport())
                 return;
             optionSupport.setEnabled(false);
-            String url = serverLocation + "/Comment/LevelOne/Support";
+            String url = serverLocation + "/CommentService/Comment/LevelOne/Support";
             Map<String,String> map = new HashMap<>(2);
             map.put("userId",String.valueOf(user.getUserId()));
             map.put("levelOneId",String.valueOf(answerCommentLevelOneVo.getCommentLevelOne().getId()));
@@ -325,7 +320,7 @@ public class AnswerActivity extends AbstractCustomActivity {
             if(answerCommentLevelTwoVo.isSupport())
                 return;
             optionSupport.setEnabled(false);
-            String url = serverLocation + "/Comment/LevelTwo/Support";
+            String url = serverLocation + "/CommentService/Comment/LevelTwo/Support";
             Map<String,String> map = new HashMap<>(2);
             map.put("userId",String.valueOf(user.getUserId()));
             map.put("levelTwoId",String.valueOf(answerCommentLevelTwoVo.getAnswerCommentLevelTwo().getId()));
@@ -418,7 +413,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         if (code == 1) {
             replyTitle.setText("评论给 ");
             submitReply.setOnClickListener(v -> {
-                String url = serverLocation + "/Comment/LevelOne";
+                String url = serverLocation + "/CommentService/Comment/LevelOne";
                 Map<String, String> map = new HashMap<>();
                 map.put("answerId", String.valueOf(answerIdOrCommentId));
                 map.put("userId", String.valueOf(user.getUserId()));
@@ -451,7 +446,7 @@ public class AnswerActivity extends AbstractCustomActivity {
                 if (StringUtils.isEmpty(content)) {
                     Toast.makeText(AnswerActivity.this,"评论不能为空",Toast.LENGTH_SHORT).show();
                 } else {
-                    String url = serverLocation + "/Comment/LevelTwo";
+                    String url = serverLocation + "/CommentService/Comment/LevelTwo";
                     Map<String, String> map = new HashMap<>();
                     map.put("commentLevelOneId", String.valueOf(answerIdOrCommentId));
                     map.put("userId", String.valueOf(user.getUserId()));
@@ -507,9 +502,9 @@ public class AnswerActivity extends AbstractCustomActivity {
     private void getInitData() {
         String url = "";
         if (user == null) {
-            url = serverLocation + "/Answer/Page/-1/" + viewBean.getQuestionId() + "/" + viewBean.getContentId();
+            url = serverLocation + "/AnswerService/Answer/Page/-1/" + viewBean.getQuestionId() + "/" + viewBean.getContentId();
         } else {
-            url = serverLocation + "/Answer/Page/" + user.getUserId() + "/" + viewBean.getQuestionId() + "/" + viewBean.getContentId();
+            url = serverLocation + "/AnswerService/Answer/Page/" + user.getUserId() + "/" + viewBean.getQuestionId() + "/" + viewBean.getContentId();
         }
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
@@ -547,7 +542,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     private void getCommentLevelOne() {
         refreshLayout.setRefreshing(true);
         Long userId = user == null ? -1 : user.getUserId();
-        String url = serverLocation + "/Comment/LevelOne/" + getCurrentAnswerId() + "/" + userId + "/" + commentHolder.getLimit();
+        String url = serverLocation + "/CommentService/Comment/LevelOne/" + getCurrentAnswerId() + "/" + userId + "/" + commentHolder.getLimit();
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -629,7 +624,7 @@ public class AnswerActivity extends AbstractCustomActivity {
 
     private void getCommentLevelTwo(Long id, Consumer<List<AnswerCommentLevelTwoVo>> callback) {
         Long userId = user == null ? -1 : user.getUserId();
-        String url = serverLocation + "/Comment/LevelTwo/" + id + "/" + userId + "/" + commentLevelTwoLimit;
+        String url = serverLocation + "/CommentService/Comment/LevelTwo/" + id + "/" + userId + "/" + commentLevelTwoLimit;
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -700,6 +695,24 @@ public class AnswerActivity extends AbstractCustomActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private View.OnClickListener commentClickListener() {
+        return v -> {
+            if (!commentHolder.isLoad()) {
+                answerCommentLevelOneVos = new ArrayList<>();
+                commentLevel1Adapter = new AnswerCommentLevelOneAdapter(AnswerActivity.this, answerCommentLevelOneVos, answerCommentLevelOneVo -> {
+                    lv1ToLv2 = answerCommentLevelOneVo;
+                    toCommentLevel2(answerCommentLevelOneVo.getCommentLevelOne().getId());
+                }, answerCommentLevelOneVo -> {
+                    showOptionDialog(answerCommentLevelOneVo);
+                });
+                level1.setAdapter(commentLevel1Adapter);
+                level1.setLayoutManager(linearLayoutManager);
+                getCommentLevelOne();
+            }
+            dialog.show();
+        };
+    }
 
     private void initToolBar() {
         toolbar.setTitle(viewBean.getTitle());
