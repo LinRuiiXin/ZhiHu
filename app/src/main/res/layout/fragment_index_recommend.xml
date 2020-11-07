@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.scwang.smart.refresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recommend_refresh_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f6f6f6"
     >
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+
+    <com.scwang.smart.refresh.header.ClassicsHeader
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/index_recommend_refresh"
-        >
+        android:layout_height="wrap_content"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recommend_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-        </androidx.recyclerview.widget.RecyclerView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="match_parent"/>
+
+    <com.scwang.smart.refresh.header.ClassicsHeader
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</com.scwang.smart.refresh.layout.SmartRefreshLayout>

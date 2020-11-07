@@ -12,6 +12,17 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //选择要添加的对应 cpu 类型的 .so 库。
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a','x86', 'x86_64', 'mips', 'mips64'
+            // 还可以添加 'x86', 'x86_64', 'mips', 'mips64'
+        }
+        manifestPlaceholders = [
+                JPUSH_PKGNAME : "com.sz.zhihu",
+                JPUSH_APPKEY : "fe9dfe647ddadbec370380be", //JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+        ]
     }
 
     buildTypes {
@@ -48,4 +59,12 @@ dependencies {
 //    compile 'com.elmargomez.typer:typerlib:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.33'
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation  'com.scwang.smart:refresh-layout-kernel:2.0.1'
+    implementation  'com.scwang.smart:refresh-header-classics:2.0.1'
+
+//    极光推送
+    compile 'cn.jiguang.sdk:jpush:3.8.6'  // 此处以JPush 3.8.6 版本为例。
+    compile 'cn.jiguang.sdk:jcore:2.5.5'  // 此处以JCore 2.5.5 版本为例。
 }

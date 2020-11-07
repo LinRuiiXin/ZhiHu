@@ -67,6 +67,13 @@ public class AnswerCommentLevelOne {
         this.hasReply = hasReply;
     }
 
+    public void incrementSupportSum(){
+        supportSum++;
+    }
+    public void decrementSupportSum(){
+        supportSum--;
+    }
+
     @Override
     public String toString() {
         return "AnswerCommentLevelOne{" +

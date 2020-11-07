@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -108,6 +109,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     private RelativeLayout optionSupport;
     private RelativeLayout optionReply;
     private RelativeLayout optionDelete;
+    private ImageView supportTriangle;
 
     public AnswerActivity(){
         fragments = new ArrayList<>();
@@ -135,6 +137,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         initToolBar();
         initViewPager();
         comment.setOnClickListener(commentClickListener());
+        support.setOnClickListener(supportListener());
     }
 
 
@@ -158,6 +161,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         support = findViewById(R.id.cb_support);
         collect = findViewById(R.id.cb_collect);
         comment = findViewById(R.id.cb_comment);
+        supportTriangle = findViewById(R.id.cb_support_triangle);
     }
 
     /*
@@ -255,42 +259,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         }
         boolean b = answerCommentLevelOneVo.getUser().getId() == user.getUserId();
         optionSupport.setOnClickListener(v -> {
-            if (answerCommentLevelOneVo.isSupport())
-                return;
-            optionSupport.setEnabled(false);
-            String url = serverLocation + "/CommentService/Comment/LevelOne/Support";
-            Map<String,String> map = new HashMap<>(2);
-            map.put("userId",String.valueOf(user.getUserId()));
-            map.put("levelOneId",String.valueOf(answerCommentLevelOneVo.getCommentLevelOne().getId()));
-            RequestUtils.postWithParams(url, map, new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    runOnUiThread(()->{
-                        Toast.makeText(AnswerActivity.this,"服务器繁忙",Toast.LENGTH_SHORT).show();
-                        optionDialog.dismiss();
-                        optionSupport.setEnabled(true);
-                    });
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
-                    runOnUiThread(()->{
-                        if(simpleDto.isSuccess()){
-                            AnswerCommentLevelOne commentLevelOne = answerCommentLevelOneVo.getCommentLevelOne();
-                            commentLevelOne.setSupportSum(commentLevelOne.getSupportSum()+1);
-                            answerCommentLevelOneVo.setSupport(true);
-                            commentLevel1Adapter.notifyDataSetChanged();
-                            optionSupport.setEnabled(true);
-                        }else{
-                            Toast.makeText(AnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
-                            optionSupport.setEnabled(true);
-                        }
-                        optionDialog.dismiss();
-                    });
-                }
-            });
-
+            commentLevel1Adapter.supportOrUnSupportComment(answerCommentLevelOneVo,()->optionDialog.dismiss());
         });
         optionReply.setOnClickListener(v -> {
             optionDialog.dismiss();
@@ -299,13 +268,50 @@ public class AnswerActivity extends AbstractCustomActivity {
         if (b) {
             optionDelete.setBackground(getDrawable(R.drawable.shape_radius_right_delete));
             optionDelete.setOnClickListener(v -> {
-
+                deleteCommentLevelOne(answerCommentLevelOneVo);
             });
         } else {
             optionDelete.setVisibility(View.GONE);
             optionReply.setBackground(getDrawable(R.drawable.shape_radius_right_reply));
         }
         optionDialog.show();
+    }
+
+    /*
+    * 删除一级评论
+    * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void deleteCommentLevelOne(AnswerCommentLevelOneVo answerCommentLevelOneVo) {
+        optionDelete.setEnabled(false);
+        String url = serverLocation + "/CommentService/Comment/LevelOne";
+        Map<String,String> params = new HashMap<>(1);
+        params.put("commentId",String.valueOf(answerCommentLevelOneVo.getCommentLevelOne().getId()));
+        RequestUtils.deleteWithParams(url, params, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(()-> {
+                    Toast.makeText(AnswerActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
+                    optionDelete.setEnabled(true);
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        answerCommentLevelOneVos.remove(answerCommentLevelOneVo);
+                        commentLevel1Adapter.notifyDataSetChanged();
+                        optionDialog.dismiss();
+                        optionDelete.setEnabled(true);
+                    }else{
+                        Toast.makeText(AnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                        optionDelete.setEnabled(true);
+                    }
+                });
+            }
+        });
+
     }
 
     //  显示"菜单"对话框，并判断是否本人操作？显示"删除评论"选项，否则不显示
@@ -317,40 +323,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         }
         boolean b = answerCommentLevelTwoVo.getReplyUser().getId() == user.getUserId();
         optionSupport.setOnClickListener(v -> {
-            if(answerCommentLevelTwoVo.isSupport())
-                return;
-            optionSupport.setEnabled(false);
-            String url = serverLocation + "/CommentService/Comment/LevelTwo/Support";
-            Map<String,String> map = new HashMap<>(2);
-            map.put("userId",String.valueOf(user.getUserId()));
-            map.put("levelTwoId",String.valueOf(answerCommentLevelTwoVo.getAnswerCommentLevelTwo().getId()));
-            RequestUtils.postWithParams(url, map, new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    runOnUiThread(()->{
-                        Toast.makeText(AnswerActivity.this,"服务器繁忙",Toast.LENGTH_SHORT).show();
-                        optionSupport.setEnabled(true);
-                    });
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
-                    runOnUiThread(()->{
-                        if(simpleDto.isSuccess()){
-                            AnswerCommentLevelTwo commentLevelTwo = answerCommentLevelTwoVo.getAnswerCommentLevelTwo();
-                            answerCommentLevelTwoVo.setSupport(true);
-                            commentLevelTwo.setSupportSum(commentLevelTwo.getSupportSum()+1);
-                            answerCommentLevelTwoAdapter.notifyDataSetChanged();
-                        }else{
-                            Toast.makeText(AnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
-                        }
-                        optionDialog.dismiss();
-                        optionSupport.setEnabled(true);
-                    });
-                }
-            });
-
+            answerCommentLevelTwoAdapter.supportOrUnSupportComment(answerCommentLevelTwoVo,()->optionDialog.dismiss());
         });
         optionReply.setOnClickListener(v -> {
             optionDialog.dismiss();
@@ -657,7 +630,12 @@ public class AnswerActivity extends AbstractCustomActivity {
      * */
     private void updateUI(int index) {
         AnswerVo currentVo = ((AnswerFragment) fragments.get(index)).getAnswerVo();
-        support.setText(currentVo.getAnswer().getSupportSum() + "赞同");
+//        support.setText(currentVo.getAnswer().getSupportSum() + "赞同");
+        boolean support = currentVo.isSupport();
+        if(support)
+            changeButtonToSupport(currentVo);
+        else
+            changeButtonToUnSupport(currentVo);
         editText.setText("");
     }
 
@@ -712,6 +690,68 @@ public class AnswerActivity extends AbstractCustomActivity {
             }
             dialog.show();
         };
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private View.OnClickListener supportListener() {
+        return v -> {
+            support.setClickable(false);
+            AnswerVo currentAnswer = getCurrentAnswer();
+            Long currentAnswerId = currentAnswer.getAnswer().getId();
+            Long userId = user.getUserId();
+            boolean isSupport = currentAnswer.isSupport();
+            String api = isSupport ? "UnSupport" : "Support";
+            String url = serverLocation + "/AnswerService/Answer/" + api;
+            Map<String,String> map = new HashMap<>(2);
+            map.put("answerId",String.valueOf(currentAnswerId));
+            map.put("userId",String.valueOf(userId));
+            RequestUtils.postWithParams(url,map, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(()->Toast.makeText(AnswerActivity.this,"请求失败",Toast.LENGTH_SHORT));
+                    support.setClickable(true);
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    try{
+                        SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                        runOnUiThread(() -> {
+                            if(simpleDto.isSuccess()){
+                                Long answerIdNow = getCurrentAnswerId();
+                                if(isSupport){
+                                    currentAnswer.unSupport();
+                                    if(answerIdNow == currentAnswerId)
+                                        changeButtonToUnSupport(currentAnswer);
+                                }else{
+                                    currentAnswer.support();
+                                    if(answerIdNow == currentAnswerId)
+                                        changeButtonToSupport(currentAnswer);
+                                }
+                            }else {
+                                Toast.makeText(AnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT);
+                            }
+                        });
+                    }finally {
+                        support.setClickable(true);
+                    }
+                }
+            });
+        };
+    }
+
+    private void changeButtonToSupport(AnswerVo currentAnswer){
+        support.setBackground(getResources().getDrawable(R.drawable.support_button_background));
+        support.setTextColor(getResources().getColor(R.color.white));
+        support.setText(currentAnswer.getAnswer().getSupportSum()+"赞同");
+        supportTriangle.setBackground(getResources().getDrawable(R.drawable.icon_triangle_white));
+    }
+    private void changeButtonToUnSupport(AnswerVo currentAnswer){
+        support.setBackground(getResources().getDrawable(R.drawable.un_support_button_background));
+        support.setTextColor(getResources().getColor(R.color.ZhiHuBlue));
+        support.setText(currentAnswer.getAnswer().getSupportSum()+"赞同");
+        supportTriangle.setBackground(getResources().getDrawable(R.drawable.icon_triangle_blue));
     }
 
     private void initToolBar() {

@@ -89,10 +89,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/acti_content"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        android:id="@+id/acti_support"
+        >
 
         <TextView
-            android:id="@+id/acti_support_sun"
+            android:id="@+id/acti_support_sum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

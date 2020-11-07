@@ -2,27 +2,41 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sz.zhihu">
 
+    <permission
+        android:name="${applicationId}.permission.JPUSH_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- Required  一些系统要求的权限，如访问网络等-->
+    <uses-permission android:name="${applicationId}.permission.JPUSH_MESSAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/zhi_hu"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/zhi_hu"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".EditVideoActivity" />
-        <activity android:name=".EditArticleActivity">
-        </activity>
+        <activity android:name=".EditArticleActivity"/>
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".BrowseActivity"></activity>
+        <activity android:name=".BrowseActivity">
+
+        </activity>
         <activity
             android:name=".AnswerActivity"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize">
+
+        </activity>
         <activity android:name=".ArticleActivity" />
         <activity android:name=".RecommendQuestionActivity" />
         <activity android:name=".AskQuestionActivity" />
@@ -31,20 +45,46 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".EditAnswerActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"></activity>
-        <activity android:name=".LoginActivity"></activity>
+            android:windowSoftInputMode="stateVisible|adjustResize">
+
+        </activity>
+        <activity android:name=".LoginActivity"/>
         <activity android:name=".SplashActivity">
+
+        </activity>
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter></activity>
-        <activity android:name=".MainActivity"></activity>
-
+            </intent-filter>
+        </activity>
+        <activity android:name=".HomePageActivity" />
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".HomePageActivity" />
+        <!-- Required since 3.0.7 -->
+        <!-- 新的 tag/alias 接口结果返回需要开发者配置一个自定的广播 -->
+        <!-- 3.3.0开始所有事件将通过该类回调 -->
+        <!-- 该广播需要继承 JPush 提供的 JPushMessageReceiver 类, 并如下新增一个 Intent-Filter -->
+        <receiver
+            android:name="com.sz.zhihu.receiver.JPushReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
+                <category android:name="com.sz.zhihu" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="com.sz.zhihu.service.JPushService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":pushcore">
+            <intent-filter>
+                <action android:name="cn.jiguang.user.service.action" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

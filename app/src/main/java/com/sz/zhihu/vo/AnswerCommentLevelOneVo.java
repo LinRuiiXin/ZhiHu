@@ -4,16 +4,16 @@ import com.sz.zhihu.po.AnswerCommentLevelOne;
 import com.sz.zhihu.po.User;
 
 public class AnswerCommentLevelOneVo {
-    private boolean isSupport;
+    private boolean support;
     private User user;
     private AnswerCommentLevelOne commentLevelOne;
 
     public boolean isSupport() {
-        return isSupport;
+        return support;
     }
 
     public void setSupport(boolean support) {
-        isSupport = support;
+        this.support = support;
     }
 
     public User getUser() {
@@ -32,10 +32,19 @@ public class AnswerCommentLevelOneVo {
         this.commentLevelOne = commentLevelOne;
     }
 
+    public void support(){
+        support = true;
+        commentLevelOne.incrementSupportSum();
+    }
+    public void unSupport(){
+        support = false;
+        commentLevelOne.decrementSupportSum();
+    }
+
     @Override
     public String toString() {
         return "AnswerCommentLevelOneVo{" +
-                "isSupport=" + isSupport +
+                "isSupport=" + support +
                 ", user=" + user +
                 ", commentLevelOne=" + commentLevelOne +
                 '}';

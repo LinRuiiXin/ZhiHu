@@ -90,16 +90,20 @@ public class EditVideoActivity extends AbstractCustomActivity {
     }
 
     private void init() {
-        showBottomDialog();
-        close = findViewById(R.id.aev_close);
-        getVideo = findViewById(R.id.aev_get_video);
-        submitButton = findViewById(R.id.aev_submit_button);
-        title = findViewById(R.id.aev_title);
-        title.clearFocus();
-        video = findViewById(R.id.aev_video);
-        video.backButton.setVisibility(View.GONE);
-        video.tinyBackImageView.setVisibility(View.GONE);
-        setListeners();
+        try {
+            showBottomDialog();
+            close = findViewById(R.id.aev_close);
+            getVideo = findViewById(R.id.aev_get_video);
+            submitButton = findViewById(R.id.aev_submit_button);
+            title = findViewById(R.id.aev_title);
+            title.clearFocus();
+            video = findViewById(R.id.aev_video);
+            video.backButton.setVisibility(View.GONE);
+            video.tinyBackImageView.setVisibility(View.GONE);
+            setListeners();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     private void setListeners() {
@@ -170,7 +174,7 @@ public class EditVideoActivity extends AbstractCustomActivity {
         adapter = new EditVideoDialogAdapter(this, allData);
         if(allData.size()<20){
             adapter.loadMoreEnd();
-            adapter.setLoadMoreView(loadMoreView);
+//            adapter.setLoadMoreView(loadMoreView);
         }
         adapter.setOnLoadMoreListener(()->{
             List<VideoMedia> data = getData();

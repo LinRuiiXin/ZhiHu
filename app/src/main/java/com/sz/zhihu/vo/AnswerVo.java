@@ -49,6 +49,16 @@ public class AnswerVo {
         this.answer = answer;
     }
 
+    public void support(){
+        this.support = true;
+        getAnswer().supportIncrement();
+    }
+
+    public void unSupport(){
+        this.support = false;
+        getAnswer().supportDecrement();
+    }
+
     @Override
     public String toString() {
         return "AnswerVo{" +

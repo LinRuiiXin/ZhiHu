@@ -81,6 +81,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_alignParentRight="true"
+                    android:id="@+id/acoi_support"
                     >
                     <TextView
                         android:layout_width="wrap_content"

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.gson.Gson;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.sz.zhihu.R;
 import com.sz.zhihu.adapter.RecommendRecyclerViewAdapter;
 import com.sz.zhihu.dto.SimpleDto;
@@ -40,7 +41,6 @@ import okhttp3.Response;
 public class RecommendFragment extends Fragment implements CustomFragmentFunction {
 
     private View view;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private Activity activity;
     private List<RecommendViewBean> data;
     private final User user;
@@ -48,6 +48,7 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     private final Gson gson;
     private RecommendRecyclerViewAdapter adapter;
     private RecyclerView recyclerView;
+    private RefreshLayout refreshLayout;
 
     public RecommendFragment(Activity activity){
         this.activity = activity;
@@ -62,10 +63,23 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(view == null) {
             view = inflater.inflate(R.layout.fragment_index_recommend, container, false);
-            swipeRefreshLayout = view.findViewById(R.id.index_recommend_refresh);
-            swipeRefreshLayout.setColorSchemeColors(R.color.blue);
-            swipeRefreshLayout.setOnRefreshListener(onRefreshListener());
-            swipeRefreshLayout.setRefreshing(true);
+            refreshLayout = view.findViewById(R.id.recommend_refresh_layout);
+            refreshLayout.setOnRefreshListener(refresh -> {
+                getData(list->{
+                    recyclerView.smoothScrollToPosition(0);
+                    data.clear();
+                    data.addAll(list);
+                    adapter.notifyDataSetChanged();
+                    refresh.finishRefresh();
+                });
+            });
+            refreshLayout.setOnLoadMoreListener(refresh -> {
+                getData(list -> {
+                    data.addAll(list);
+                    adapter.notifyDataSetChanged();
+                    refresh.finishLoadMore();
+                });
+            });
             recyclerView = view.findViewById(R.id.recommend_recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             adapter = new RecommendRecyclerViewAdapter(getContext(), data);
@@ -83,10 +97,10 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     * */
     @Override
     public void refreshPage() {
-        swipeRefreshLayout.setRefreshing(true);
+//        swipeRefreshLayout.setRefreshing(true);
         recyclerView.smoothScrollToPosition(0);
         getData(list -> {
-            swipeRefreshLayout.setRefreshing(false);
+//            swipeRefreshLayout.setRefreshing(false);
             data.clear();
             data.addAll(list);
             adapter.notifyDataSetChanged();
@@ -109,9 +123,9 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
     public void getData(Consumer<List<RecommendViewBean>> consumer){
         String url;
         if(user == null){
-            url = serverLocation + "/Recommend/Index/-1";
+            url = serverLocation + "/RecommendService/Recommend/Index/-1";
         }else{
-            url = serverLocation + "/Recommend/Index/" + user.getUserId();
+            url = serverLocation + "/RecommendService/Recommend/Index/" + user.getUserId();
         }
 
         RequestUtils.sendSimpleRequest(url, new Callback() {
@@ -133,7 +147,6 @@ public class RecommendFragment extends Fragment implements CustomFragmentFunctio
                             RecommendViewBean recommendViewBean = gson.fromJson(gson.toJson(o), RecommendViewBean.class);
                             res.add(recommendViewBean);
                         });
-                        swipeRefreshLayout.setRefreshing(false);
                         Collections.shuffle(res);
                         consumer.accept(res);
                     }else{

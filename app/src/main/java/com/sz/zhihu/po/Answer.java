@@ -101,6 +101,13 @@ public class Answer {
         this.time = time;
     }
 
+    public void supportIncrement(){
+        this.supportSum++;
+    }
+    public void supportDecrement() {
+        this.supportSum--;
+    }
+
     @Override
     public String toString() {
         return "Answer{" +
@@ -115,4 +122,5 @@ public class Answer {
                 ", time=" + time +
                 '}';
     }
+
 }

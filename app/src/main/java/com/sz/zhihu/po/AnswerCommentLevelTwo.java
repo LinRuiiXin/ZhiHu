@@ -67,6 +67,13 @@ public class AnswerCommentLevelTwo {
         this.supportSum = supportSum;
     }
 
+    public void incrementSupportSum(){
+        supportSum++;
+    }
+
+    public void decrementSupportSum(){
+        supportSum--;
+    }
     @Override
     public String toString() {
         return "AnswerCommentLevelTwo{" +

@@ -41,6 +41,16 @@ public class AnswerCommentLevelTwoVo {
         this.replyUser = replyUser;
     }
 
+    public void support(){
+        this.isSupport = true;
+        answerCommentLevelTwo.incrementSupportSum();
+    }
+
+    public void unSupport(){
+        this.isSupport = false;
+        answerCommentLevelTwo.decrementSupportSum();
+    }
+
     @Override
     public String toString() {
         return "AnswerCommentLevelTwoVo{" +
