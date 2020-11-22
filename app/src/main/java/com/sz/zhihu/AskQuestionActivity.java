@@ -54,13 +54,7 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
     private TextView back;
     private TextView commit;
     private EditText question;
-    private RichEditorNew questionDescribe;
-    private Button bold;
-    private Button italic;
-    private Button title;
-    private Button order;
-    private Button photo;
-    private Button video;
+    private EditText questionDescribe;
     private final int CODE_IMAGE = 1;
     private final int CODE_VIDEO = 2;
     private String serverLocation;
@@ -83,24 +77,12 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
         commit = findViewById(R.id.aq_commit);
         question = findViewById(R.id.aq_question);
         questionDescribe = findViewById(R.id.aq_question_describe);
-        bold = findViewById(R.id.aq_button_bold);
-        italic = findViewById(R.id.aq_button_italic);
-        title = findViewById(R.id.aq_button_title);
-        order = findViewById(R.id.aq_button_order);
-        photo = findViewById(R.id.aq_button_photo);
-        video = findViewById(R.id.aq_button_video);
-        questionDescribe.setPlaceholder("对问题补充说明，可以更快获得解答（选填）");
         serverLocation = getResources().getString(R.string.server_location);
         user = DBUtils.queryUserHistory();
         gson = new Gson();
         back.setOnClickListener(this);
         choiceType.setOnClickListener(this);
-        italic.setOnClickListener(this);
-        title.setOnClickListener(this);
-        order.setOnClickListener(this);
-        photo.setOnClickListener(this);
-        video.setOnClickListener(this);
-        commit.setOnClickListener(this);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -119,14 +101,14 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
                     if(!types.isEmpty()){
                         if(question.trim().length()>3){
                             commit.setEnabled(false);
-                            String url = serverLocation + "/Question";
+                            String url = serverLocation + "/QuestionService/Question";
                             Map<String,String> map = new HashMap<>();
                             map.put("userId",String.valueOf(user.getUserId()));
                             map.put("questionName",question);
                             map.put("typeStr",getTypeStr());
-                            String content = questionDescribe.getHtml();
+                            String content = questionDescribe.getText().toString();
                             File file = new File("");
-                            if(!StringUtils.isEmpty(HtmlUtils.getImgFromHtml(content))||!StringUtils.isEmpty(HtmlUtils.getVideoFromHtml(content))||HtmlUtils.getContentFromHtml(content).trim().length()>0){
+                            if(StringUtils.isEmpty(content)){
                                 file = FileUtils.getTemporaryText(content);
                             }
                             RequestUtils.sendFileWithParam(file, url, "describe",map, new Callback() {
@@ -164,7 +146,7 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
                     Toast.makeText(this,"问题不能为空",Toast.LENGTH_SHORT).show();
                 }
                 break;
-            case R.id.aq_button_bold:
+            /*case R.id.aq_button_bold:
                 questionDescribe.setBold();
                 break;
             case R.id.aq_button_italic:
@@ -187,7 +169,7 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
                 if(PermissionUtils.registerPerMission(this, Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
                     getVideoFromPhotoAlbum();
                 }
-                break;
+                break;*/
         }
     }
 
@@ -226,7 +208,7 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
         Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(i, CODE_VIDEO);
     }
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode == Activity.RESULT_OK){
             switch (requestCode) {
@@ -301,7 +283,7 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 
     public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight) {
         // 获得图片的宽高

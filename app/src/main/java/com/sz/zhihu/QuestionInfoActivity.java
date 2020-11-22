@@ -34,7 +34,9 @@ import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import okhttp3.Call;
@@ -47,7 +49,7 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
     private String title;
     private Gson gson;
     private Toolbar toolbar;
-    private RichEditorNew questionDescribe;
+    private TextView questionDescribe;
     private LinearLayout showAll;
     private TextView showAllIcon;
     private RelativeLayout writeAnswer;
@@ -68,7 +70,12 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
     private Drawable icon_unFold;
     private TextView showAllText;
     private User user;
+    private Drawable has_attention_question;
+    private Drawable has_not_attention_question;
+    private TextView attentionQuestionIcon;
+    private TextView attentionQuestionText;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +83,7 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
         init();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
         prepare();
         bindComponent();
@@ -99,6 +107,8 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
         questionInfoHolder = new QuestionInfoHolder();
         icon_folding = getDrawable(R.drawable.icon_show_all);
         icon_unFold = getDrawable(R.drawable.icon_hide_describe);
+        has_attention_question = getDrawable(R.drawable.icon_has_attention);
+        has_not_attention_question = getDrawable(R.drawable.icon_attention_question);
     }
 
     /*
@@ -114,18 +124,21 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
         showAllText = findViewById(R.id.aqi_show_all_text);
         writeAnswer = findViewById(R.id.aqi_write_answer);
         attentionQuestion = findViewById(R.id.aqi_attention_question);
+        attentionQuestionIcon = findViewById(R.id.aqi_attention_question_icon);
+        attentionQuestionText = findViewById(R.id.aqi_attention_question_text);
+        answerList = findViewById(R.id.aqi_answer_list);
         answerSum = findViewById(R.id.aqi_answer_sum);
         subscribeSum = findViewById(R.id.aqi_subscribe_sum);
         broseSum = findViewById(R.id.aqi_browse_sum);
         refreshLayout = findViewById(R.id.aqi_refresh);
         refreshLayout.setEnableRefresh(false);
-        answerList = findViewById(R.id.aqi_answer_list);
         initToolBar();
     }
 
     /*
      * 绑定监听
      * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void bindListeners() {
         refreshLayout.setOnLoadMoreListener(listener -> {
             if(!answerListHolder.isLoaded)
@@ -137,13 +150,40 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
                 getAnswerList(listener::finishLoadMore);
             }
         });
-       /* showAll.setOnClickListener(v->{
-            if(isShowAll){
-                changeShowAllToUnFold();
-            }else{
-                changeShowAllToFolding();
+        writeAnswer.setOnClickListener(v -> {});
+        attentionQuestion.setOnClickListener(v -> {
+            attentionQuestion.setClickable(false);
+            if(DBUtils.checkIsLogged(this)){
+                String api = questionInfoHolder.isAttention ? "UnAttention" : "Attention";
+                String url = serverLocation + "/QuestionService/Question/" + api;
+                Map<String,String> params = new HashMap<>(2);
+                params.put("questionId",String.valueOf(questionId));
+                params.put("userId",String.valueOf(user.getUserId()));
+                RequestUtils.postWithParams(url, params, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        runOnUiThread(()->{
+                            Toast.makeText(QuestionInfoActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                            attentionQuestion.setClickable(true);
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        SimpleDto simpleDto = GsonUtils.parseJsonToSimpleDto(response.body().string());
+                        runOnUiThread(()->{
+                            if(simpleDto.isSuccess()){
+                                questionInfoHolder.isAttention = !(questionInfoHolder.isAttention);
+                                changeAttentionButton();
+                            }else{
+                                Toast.makeText(QuestionInfoActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                            }
+                            attentionQuestion.setClickable(true);
+                        });
+                    }
+                });
             }
-        });*/
+        });
         buttonControl(false);
     }
 
@@ -189,18 +229,19 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
         subscribeSum.setText(String.valueOf(question.getSubscribeSum()));
         broseSum.setText(String.valueOf(question.getBrowseSum()));
         if(questionInfoVo.getQuestion().getHasDescribe() != 0){
-            questionInfoHolder.html = questionInfoVo.getDescribe();
+            questionInfoHolder.allDescribe = questionInfoVo.getDescribe();
             decisionIsNeedShowAllOption(questionInfoHolder);
             if(questionInfoHolder.isNeedShowAllOption){
                 showAll.setVisibility(View.VISIBLE);
-                questionDescribe.loadRichEditorCode(questionInfoHolder.brief);
+                questionDescribe.setText(questionInfoHolder.brief);
                 showAll.setOnClickListener(showAllListener(questionInfoHolder));
                 buttonControl(true);
             }else{
-                questionDescribe.loadRichEditorCode(questionInfoHolder.html);
+                questionDescribe.setText(questionInfoHolder.allDescribe);
             }
         }
-
+        questionInfoHolder.isAttention = questionInfoVo.isAttention();
+        changeAttentionButton();
     }
 
 
@@ -272,21 +313,21 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
     *  决定是否需要 "显示更多" 选项按钮
     * */
     private void decisionIsNeedShowAllOption(QuestionInfoHolder questionInfoHolder) {
-        String describeAllText = HtmlUtils.getContentFromHtml(questionInfoHolder.html);
-        if(describeAllText.length() > 30){
+        String describeAllText = questionInfoHolder.allDescribe;
+        if(describeAllText.length() > 100){
             questionInfoHolder.isNeedShowAllOption = true;
-            questionInfoHolder.brief = describeAllText.substring(0,30);
+            questionInfoHolder.brief = describeAllText.substring(0,100);
         }
     }
 
     private View.OnClickListener showAllListener(QuestionInfoHolder questionInfoHolder) {
         return v -> {
             if(isShowAll){
-                questionDescribe.loadRichEditorCode(questionInfoHolder.brief);
+                questionDescribe.setText(questionInfoHolder.brief);
                 isShowAll = false;
                 changeShowAllToUnFold();
             }else{
-                questionDescribe.loadRichEditorCode(questionInfoHolder.html);
+                questionDescribe.setText(questionInfoHolder.allDescribe);
                 isShowAll = true;
                 changeShowAllToFolding();
             }
@@ -303,6 +344,24 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
         showAllText.setText("显示全部");
     }
 
+
+    private void changeAttentionButton() {
+        if(questionInfoHolder.isAttention)
+            changeAttentionButtonToAttention();
+        else
+            changeAttentionButtonToUnAttention();
+    }
+
+    private void changeAttentionButtonToAttention(){
+        attentionQuestionIcon.setBackground(has_attention_question);
+        attentionQuestionText.setText("已关注");
+    }
+
+    private void changeAttentionButtonToUnAttention(){
+        attentionQuestionIcon.setBackground(has_not_attention_question);
+        attentionQuestionText.setText("关注问题");
+    }
+
     private void buttonControl(boolean b) {
         showAll.setClickable(b);
         writeAnswer.setClickable(b);
@@ -311,8 +370,9 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
 
     class QuestionInfoHolder{
         boolean isNeedShowAllOption;
+        boolean isAttention;
         String brief;
-        String html;
+        String allDescribe;
     }
 
     class AnswerListHolder{

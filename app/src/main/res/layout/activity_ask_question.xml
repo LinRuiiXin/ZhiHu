@@ -54,7 +54,7 @@
         android:textStyle="bold"
         android:textSize="20dp"
         />
-    <com.rex.editor.view.RichEditorNew
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/aq_question_describe"
@@ -66,8 +66,9 @@
         android:layout_marginBottom="60dp"
         android:textSize="17dp"
         android:layout_marginTop="120dp"
+        android:hint="对问题补充说明，可以更快获得解答(选填)"
         />
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
@@ -139,9 +140,9 @@
             android:layout_height="match_parent"
             android:id="@+id/aq_button_divider"
             android:layout_gravity="center_vertical"
-            android:text="----"
+            android:text="&#45;&#45;&#45;&#45;"
             android:enabled="false"
             />
 
-    </LinearLayout>
+    </LinearLayout>-->
 </RelativeLayout>
