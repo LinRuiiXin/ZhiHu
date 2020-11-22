@@ -2,7 +2,7 @@
   {
     "name" : "基本设置",
     "className" : ["Account"],
-     "params" : ["账号与安全"]
+    "params" : ["账号与安全"]
   },
   {
     "name" : "通知设置",

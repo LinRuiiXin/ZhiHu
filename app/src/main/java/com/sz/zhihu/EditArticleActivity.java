@@ -1,19 +1,311 @@
 package com.sz.zhihu;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.rex.editor.view.RichEditorNew;
 import com.sz.zhihu.compoent.RichEditor;
+import com.sz.zhihu.dto.SimpleDto;
+import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.ArrayUtils;
+import com.sz.zhihu.utils.DBUtils;
+import com.sz.zhihu.utils.FileUtils;
+import com.sz.zhihu.utils.HtmlUtils;
+import com.sz.zhihu.utils.PermissionUtils;
+import com.sz.zhihu.utils.RequestUtils;
+import com.sz.zhihu.utils.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class EditArticleActivity extends AbstractCustomActivity {
 
+    private TextView close;
+    private EditText title;
+    private RichEditorNew content;
+    private Button boldButton;
+    private Button italicButton;
+    private Button orderButton;
+    private Button photoButton;
+    private Button titleButton;
+    private Button videoButton;
+    private Button dividerButton;
+    private final int CODE_IMAGE = 1;
+    private final int CODE_VIDEO = 2;
+    private String serverLocation;
+    private User user;
+    private Gson gson;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_article);
-        RichEditor richEditor = findViewById(R.id.aea_rich_editor);
-        richEditor.setHtml("<h2 style=\"color: rgb(68, 68, 68); font-family: inherit; font-style: inherit; font-variant: inherit; background-color: rgb(255, 255, 255); margin: 0px 0px 1.16667em; font-stretch: inherit; font-size: 1.2em; line-height: 1.5; clear: left;\">连美军特种部队也派人造<span class=\"SearchEntity-Wrapper\"><a class=\"SearchEntity\" href=\"https://www.zhihu.com/search?q=%E5%8F%A3%E7%BD%A9&amp;source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A1135815571%7D\" data-za-not-track-link=\"true\" data-za-detail-view-path-module=\"EntitySearchWordItem\" data-za-detail-view-path-module_name=\"人工\" style=\"text-decoration-line: none;\"><span class=\"SearchEntity-text\" style=\"color: rgb(23, 81, 153);\">口罩</span><svg class=\"Icon Icon--SearchEntity SearchEntity-icon\" width=\"15\" height=\"15\" viewBox=\"0 0 15 15\" fill=\"currentColor\"><path d=\"M10.89 9.477l3.06 3.059a1 1 0 0 1-1.414 1.414l-3.06-3.06a6 6 0 1 1 1.414-1.414zM6 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z\"></path></svg></a></span>了，可产量却。。。</h2><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据美国国防部网站3日消息，为了解决美国防疫物资短缺，美国陆军特种部队等多个单位，开始派兵参与口罩生产。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div class=\"ImageLoader-imageWrapper\" style=\"position: relative;\"><img data-size=\"normal\" data-rawwidth=\"1080\" data-rawheight=\"407\" data-default-watermark-src=\"https://pic2.zhimg.com/50/v2-782f1d19d887ed67205a1841e16c858d_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-7ac732248b4db129fa32965079aeca0d_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-7ac732248b4db129fa32965079aeca0d_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-7ac732248b4db129fa32965079aeca0d_1440w.webp\" class=\"ImageLoader-image loaded origin_image zh-lightbox-thumb lazy\" src=\"https://pic1.zhimg.com/80/v2-7ac732248b4db129fa32965079aeca0d_1440w.webp\" style=\"width: 361px; height: 136.044px; object-fit: cover; display: block; max-width: 100%; margin: 0px auto; background-color: transparent; cursor: zoom-in;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：美国国防部官网</figcaption></figure><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">报道称，美军第一特种作战群下辖部队已在基地开始生产口罩等防疫物资，供物资短缺的前线医护人员使用。目前，这些物资将供应军队医院和地方合作机构。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div class=\"ImageLoader-imageWrapper\" style=\"position: relative;\"><img data-size=\"normal\" data-rawwidth=\"783\" data-rawheight=\"527\" data-default-watermark-src=\"https://pic1.zhimg.com/50/v2-d7c49cfd7b54c8a1335fae8116da9b2e_hd.jpg\" data-original=\"https://pic2.zhimg.com/v2-e9eee6930613104f784468e485b8ba1b_r.jpg\" data-actualsrc=\"https://pic2.zhimg.com/50/v2-e9eee6930613104f784468e485b8ba1b_hd.jpg\" data-src=\"https://pic2.zhimg.com/80/v2-e9eee6930613104f784468e485b8ba1b_1440w.webp\" class=\"ImageLoader-image loaded origin_image zh-lightbox-thumb lazy\" src=\"https://pic2.zhimg.com/80/v2-e9eee6930613104f784468e485b8ba1b_1440w.webp\" style=\"width: 361px; height: 242.972px; object-fit: cover; display: block; max-width: 100%; margin: 0px auto; background-color: transparent; cursor: zoom-in;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">美军士兵正在操作缝纫机，图源：美国国防部官网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据称，生产工作主要由该部队集团支援营负责，转产用的缝纫机来自负责修补降落伞的部门。据美国广播公司（ABC）新闻频道称，该部队目前的主攻方向，是运用3D打印技术生产防护面罩、生产可重复使用的N95口罩，以及研究加大产能的相关事宜。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"992\" data-rawheight=\"558\" data-default-watermark-src=\"https://pic4.zhimg.com/50/v2-0d0814934f7e290c769dd67ea03f09b3_hd.jpg\" data-original=\"https://pic2.zhimg.com/v2-01ed80d24db4606dc1083583ca54cba1_r.jpg\" data-actualsrc=\"https://pic2.zhimg.com/50/v2-01ed80d24db4606dc1083583ca54cba1_hd.jpg\" data-src=\"https://pic2.zhimg.com/80/v2-01ed80d24db4606dc1083583ca54cba1_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 203.062px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">操作3D打印设备的美军士兵，图源：ABC新闻网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">在ABC新闻的报道中，这位集团支援营营长认为，该部队目前的工作<span style=\"font-weight: 700;\">“对帮助医护人员和美国同胞来说，是一次非凡的努力。”他还表示，这对锻炼部队学习创造性解决问题而言，是一次值得的演练。</span></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\"><span style=\"font-weight: 700;\">“尤其是美军拥有全世界最强大的实力。”这位营长说。</span></p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"858\" data-rawheight=\"251\" data-default-watermark-src=\"https://pic3.zhimg.com/50/v2-0dd9620cdc4b28b1d0c54aa80cd8bdec_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-635e605f1837e18fed8e5221dc0b677e_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-635e605f1837e18fed8e5221dc0b677e_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-635e605f1837e18fed8e5221dc0b677e_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 105.607px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：ABC新闻网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">但从国防部和ABC新闻提供的数据看，在该部队动用了各项新技术后，产量仍低得尴尬。</p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\"><span style=\"font-weight: 700;\">“空中运输排一天能生产200个口罩，最开始，我们只有5台轻型缝纫机。但我们会努力争取每周能造1000-1500个”这个营长如是说。</span></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">相比之下，此前兰博基尼汽车公司在改组生产线后，手工口罩日产量为1000只。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"906\" data-rawheight=\"407\" data-default-watermark-src=\"https://pic2.zhimg.com/50/v2-df2f8cd5686ce37d8f03c9cdac1f46e9_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-09f0a31cd9a878848716c4b070da471d_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-09f0a31cd9a878848716c4b070da471d_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-09f0a31cd9a878848716c4b070da471d_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 162.171px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：美国国防部官网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据美国军方相关网站介绍，美国第一特种作战群的集团支援营，主要工作是负责特战群作战时架设基地、维修生产等后方支援任务。</p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">在介绍文件里，该部队自称有效减少了官僚主义对支援工作的干涉，一切从实战出</p>");
+        init();
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void init() {
+        serverLocation = getString(R.string.server_location);
+        user = DBUtils.queryUserHistory();
+        gson = new Gson();
+        initComponent();
+        initRichEditor();
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void initComponent() {
+        close = findViewById(R.id.aea_close);
+        TextView submit = findViewById(R.id.aea_submit);
+        title = findViewById(R.id.aea_title);
+        content = findViewById(R.id.aea_content);
+        boldButton = findViewById(R.id.aea_button_bold);
+        italicButton = findViewById(R.id.aea_button_italic);
+        orderButton = findViewById(R.id.aea_button_order);
+        photoButton = findViewById(R.id.aea_button_photo);
+        titleButton = findViewById(R.id.aea_button_title);
+        videoButton = findViewById(R.id.aea_button_video);
+        dividerButton = findViewById(R.id.aea_button_divider);
+        close.setOnClickListener(v -> finish());
+        submit.setOnClickListener(v -> submitArticle());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void submitArticle() {
+        String html = content.getHtml();
+        validate(html,()->{
+            Map<String,String> params = new HashMap<>(5);
+            parseHtml(params,html);
+            params.put("title",title.getText().toString());
+            params.put("userId",String.valueOf(user.getUserId()));
+            String url = serverLocation + "/ArticleService/Article";
+            RequestUtils.sendFileWithParam(FileUtils.getTemporaryText(html), url, "article", params, new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(()->Toast.makeText(EditArticleActivity.this,"请求失败",Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                    runOnUiThread(()->{
+                        if(simpleDto.isSuccess()){
+                            Toast.makeText(EditArticleActivity.this,"上传成功",Toast.LENGTH_SHORT).show();
+                            finish();
+                        }else{
+                            Toast.makeText(EditArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    /*
+    * 校验标题，内容是否不为空，校验通过后，回调runnable函数
+    * */
+    public void validate(String html,Runnable runnable){
+        if(!StringUtils.isEmpty(title.getText().toString())){
+            if(html != null && !StringUtils.isEmpty(html)){
+                runnable.run();
+            }else{
+                Toast.makeText(this,"请输入内容",Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(this,"请输入标题",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /*
+    * 解析html并提取所需参数
+    * */
+    private void parseHtml(Map<String,String> map,String html) {
+        Integer contentType = HtmlUtils.getContentType(html);
+        String resource = "";
+        if(contentType == HtmlUtils.TYPE_HAS_VIDEO)
+            resource = HtmlUtils.getVideoFromHtml(html);
+        else if (contentType == HtmlUtils.TYPE_HAS_IMAGE)
+            resource = HtmlUtils.getImgFromHtml(html);
+        if(contentType != HtmlUtils.TYPE_ALL_TEXT)
+            resource = getResourceFileName(resource);
+        String content = HtmlUtils.getContentFromHtml(html);
+        int len = content.length() > 50 ? 50 : content.length();
+        String contentFromHtml = content.substring(0,len);
+        map.put("contentType",String.valueOf(contentType));
+        map.put("thumbnail",resource);
+        map.put("content",contentFromHtml);
+    }
+
+    /*
+    * 获取资源的文件名
+    * 如:由 http://localhost:8080/res/1234.jpg 转化为 1234.jpg
+    * */
+    private String getResourceFileName(String resource) {
+        String[] split = resource.split("/");
+        return split[split.length-1];
+    }
+
+    private void initRichEditor() {
+        content.setPlaceholder("请输入内容");
+        boldButton.setOnClickListener(v->content.setBold());
+        italicButton.setOnClickListener(v->content.setItalic());
+        orderButton.setOnClickListener(v->content.setNumbers());
+        titleButton.setOnClickListener(v->content.setHeading(3));
+        dividerButton.setOnClickListener(v->{});
+        photoButton.setOnClickListener(v -> {
+            if(PermissionUtils.registerPerMission(this, Manifest.permission.READ_EXTERNAL_STORAGE)){
+                getBitMapFromPhotoAlbum();
+            }
+        });
+        videoButton.setOnClickListener(v -> {
+            //如果权限已通过
+            if(PermissionUtils.registerPerMission(this, Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                getVideoFromPhotoAlbum();
+            }
+        });
+
+    }
+
+    private void getBitMapFromPhotoAlbum() {
+        Intent intent = new Intent(Intent.ACTION_PICK,null);
+        intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+        startActivityForResult(intent,CODE_IMAGE);
+
+    }
+
+    private void getVideoFromPhotoAlbum() {
+        Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(i, CODE_VIDEO);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == 1){
+            String[] permissionNotAgrees = ArrayUtils.getPermissionNotAgrees(permissions, grantResults);
+            if(permissionNotAgrees == null || permissionNotAgrees.length ==0){
+                getBitMapFromPhotoAlbum();
+            }else{
+                Toast.makeText(this,"通过权限才能使用此功能",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(resultCode == Activity.RESULT_OK){
+            switch (requestCode) {
+                case CODE_IMAGE:
+                    try {
+                        Uri uri = data.getData();
+                        Bitmap oldBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
+                        Bitmap newBitmap = zoomImg(oldBitmap, 250,250);
+                        File file = FileUtils.getFile(newBitmap);
+                        if(FileUtils.checkOutFileSize(file,5242880)){
+                            String url = serverLocation + "/UploadService/Upload/Image/" + user.getUserId();
+                            Toast.makeText(this,"正在上传...",Toast.LENGTH_SHORT).show();
+                            RequestUtils.sendSingleFile(file, url, "image", new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
+                                    runOnUiThread(()-> Toast.makeText(EditArticleActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                }
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                                    runOnUiThread(()->{
+                                        if(simpleDto.isSuccess()){
+                                            String imageUrl = serverLocation + "/res/Image/"+simpleDto.getMsg();
+                                            content.insertImage(imageUrl);
+                                        }else{
+                                            Toast.makeText(EditArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
+                        }else{
+                            Toast.makeText(this,"图片大小不能超过5MB",Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
+                case CODE_VIDEO:
+                    try {
+                        Uri uri = data.getData();
+                        File file = new File(FileUtils.getRealPathFromURI(this,uri));
+                        if(FileUtils.checkOutFileSize(file,20971520)){
+                            String url = serverLocation + "/UploadService/Upload/Video/"+user.getUserId();
+                            Toast.makeText(this,"正在上传...",Toast.LENGTH_SHORT).show();
+                            RequestUtils.sendSingleFile(file, url, "video", new Callback() {
+                                @Override
+                                public void onFailure(Call call, IOException e) {
+                                    runOnUiThread(()->Toast.makeText(EditArticleActivity.this,"上传失败",Toast.LENGTH_SHORT).show());
+                                }
+
+                                @Override
+                                public void onResponse(Call call, Response response) throws IOException {
+                                    SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                                    runOnUiThread(()->{
+                                        if(simpleDto.isSuccess()){
+                                            String url = serverLocation + "/res/Video/" + simpleDto.getMsg();
+                                            content.insertVideo(url);
+                                        }else{
+                                            Toast.makeText(EditArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+                            });
+                        }else{
+                            Toast.makeText(this,"视频大小不能超过20MB",Toast.LENGTH_SHORT).show();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight) {
+        // 获得图片的宽高
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = scaleWidth;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
+        return newbm;
     }
 }

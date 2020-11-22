@@ -1,21 +1,108 @@
 package com.sz.zhihu;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.rex.editor.view.RichEditorNew;
+import com.sz.zhihu.adapter.AnswerCommentLevelOneAdapter;
+import com.sz.zhihu.adapter.AnswerCommentLevelTwoAdapter;
+import com.sz.zhihu.adapter.ArticleCommentLevelOneAdapter;
+import com.sz.zhihu.adapter.ArticleCommentLevelTwoAdapter;
+import com.sz.zhihu.dto.SimpleDto;
+import com.sz.zhihu.holder.CommentHolder;
+import com.sz.zhihu.po.AnswerCommentLevelOne;
+import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.DBUtils;
+import com.sz.zhihu.utils.DiaLogUtils;
+import com.sz.zhihu.utils.RequestUtils;
+import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
+import com.sz.zhihu.view.AnswerCommentDialogView;
+import com.sz.zhihu.vo.AnswerCommentLevelOneVo;
+import com.sz.zhihu.vo.AnswerCommentLevelTwoVo;
+import com.sz.zhihu.vo.ArticleCommentLevelOneVo;
+import com.sz.zhihu.vo.ArticleCommentLevelTwoVo;
+import com.sz.zhihu.vo.ArticleVo;
+import com.sz.zhihu.vo.RecommendViewBean;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 import static com.sz.zhihu.R.id.article_tool_bar;
 
 public class ArticleActivity extends AbstractCustomActivity {
 
+    private RecommendViewBean recommendViewBean;
+    private RichEditorNew content;
+    private Gson gson;
+    private User user;
+    private String serverLocation;
+    private Button support;
+    private LinearLayout collect;
+    private LinearLayout comment;
+    private ArticleToken articleToken;
+    private ImageView supportTriangle;
+    private View dialogView;
+    private SwipeRefreshLayout refreshLayout;
+    private RecyclerView level1;
+    private RecyclerView level2;
+    private BottomSheetDialog dialog;
+    private BottomSheetBehavior<View> behavior;
+    private boolean inLevelOne = true;
+    private ArticleCommentLevelOneVo lv1ToLv2;
+    private User author;
+    private View replyView;
+    private BottomSheetDialog replyDialog;
+    private EditText replyEditText;
+    private TextView replyTitle;
+    private TextView replyObjectName;
+    private TextView submitReply;
+    private CommentHolder commentHolder;
+    private List<ArticleCommentLevelOneVo> articleCommentLevelOneVos;
+    private ArticleCommentLevelOneAdapter commentLevel1Adapter;
+    private LinearLayoutManager linearLayoutManager;
+    private Long articleId;
+    private View optionView;
+    private RelativeLayout optionSupport;
+    private RelativeLayout optionReply;
+    private RelativeLayout optionDelete;
+    private BottomSheetDialog optionDialog;
+    private ArticleCommentLevelTwoAdapter articleCommentLevelTwoAdapter;
+    //初始化二级评论
+    List<ArticleCommentLevelTwoVo> commentLevelTwoVos = new ArrayList<>();
+    private int commentLevelTwoLimit = 0;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,15 +111,651 @@ public class ArticleActivity extends AbstractCustomActivity {
         init();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void init() {
+        prepare();
+        bindComponent();
+        initToolBar();
+        initReplyDialog();
+        initOptionDialog();
+        initCommentDialog();
+        getContent(articleVoCallBack());
+    }
+
+    /*
+    * 获取到文章数据时回调
+    * */
+    private Consumer<ArticleVo> articleVoCallBack() {
+        return articleVo -> {
+            articleToken = new ArticleToken(articleVo.isSupport(),articleVo.isAttention(),recommendViewBean.getSupportSum());
+            changeSupportButton(articleToken);
+            content.loadRichEditorCode(articleVo.getContent());
+            buttonControl(true);
+        };
+    }
+
+
+    /*
+    * 准备工作，如果传递的类型不为2--即文章，退出
+    * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void prepare() {
+        recommendViewBean = (RecommendViewBean) getIntent().getSerializableExtra("viewBean");
+        if(recommendViewBean == null || recommendViewBean.getContentType() != 2){
+            Toast.makeText(this,"发生未知异常",Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        articleId = recommendViewBean.getContentId();
+        author = new User(recommendViewBean.getUserId(),0l,recommendViewBean.getUsername(),null,null,null,recommendViewBean.getIntroduction(),recommendViewBean.getPortraitFileName(),null);
+        gson = new Gson();
+        user = DBUtils.queryUserHistory();
+        serverLocation = getString(R.string.server_location);
+        commentHolder = new CommentHolder();
+        linearLayoutManager = new LinearLayoutManager(this);
+        articleCommentLevelTwoAdapter = new ArticleCommentLevelTwoAdapter(this,commentLevelTwoVos,this::showOptionDialog);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void bindComponent() {
+        content = findViewById(R.id.aa_content);
+        support = findViewById(R.id.cb_support);
+        collect = findViewById(R.id.cb_collect);
+        comment = findViewById(R.id.cb_comment);
+        supportTriangle = findViewById(R.id.cb_support_triangle);
+        buttonControl(false);
+        support.setOnClickListener(supportListener());
+        comment.setOnClickListener(commentClickListener());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private View.OnClickListener supportListener() {
+        return v -> {
+            if(DBUtils.checkIsLogged(this)){
+                if(articleToken != null){
+                    support.setClickable(false);
+                    String api = articleToken.isSupport() ? "UnSupport" : "Support";
+                    Map<String,String> params = new HashMap<>(2);
+                    params.put("userId",String.valueOf(user.getUserId()));
+                    params.put("articleId",String.valueOf(recommendViewBean.getContentId()));
+                    String url = serverLocation + "/ArticleService/Article/" + api;
+                    RequestUtils.postWithParams(url,params, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            runOnUiThread(()-> {
+                                Toast.makeText(ArticleActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
+                                support.setClickable(true);
+                            });
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                            runOnUiThread(()->{
+                                if(simpleDto.isSuccess()){
+                                    articleToken.reverseSupport();
+                                    changeSupportButton(articleToken);
+                                }else
+                                    Toast.makeText(ArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                support.setClickable(true);
+                            });
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private View.OnClickListener commentClickListener() {
+        return v -> {
+            if (!commentHolder.isLoad()) {
+                articleCommentLevelOneVos = new ArrayList<>();
+                commentLevel1Adapter = new ArticleCommentLevelOneAdapter(ArticleActivity.this, articleCommentLevelOneVos, articleCommentLevelOneVo -> {
+                    lv1ToLv2 = articleCommentLevelOneVo;
+                    toCommentLevel2(articleCommentLevelOneVo.getArticleCommentLevelOne().getId());
+                },this::showOptionDialog);
+                level1.setAdapter(commentLevel1Adapter);
+                level1.setLayoutManager(linearLayoutManager);
+                getCommentLevelOne();
+            }
+            dialog.show();
+        };
+    }
+    //    初始化"菜单"对话框
+    private void initOptionDialog() {
+        optionView = View.inflate(this, R.layout.comment_option_dialog, null);
+        optionDialog = new BottomSheetDialog(this);
+        optionDialog.setContentView(optionView);
+        optionDialog.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        behavior = BottomSheetBehavior.from((View) optionView.getParent());
+        behavior.setPeekHeight(getPeekHeight());
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if (i == BottomSheetBehavior.STATE_HIDDEN) {
+                    optionDialog.dismiss();
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+            }
+        });
+        optionSupport = optionView.findViewById(R.id.cod_support);
+        optionReply = optionView.findViewById(R.id.cod_reply);
+        optionDelete = optionView.findViewById(R.id.cod_delete);
+
+    }
+
+    //  显示"菜单"对话框，并判断是否本人操作？显示"删除评论"选项，否则不显示
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void showOptionDialog(ArticleCommentLevelTwoVo articleCommentLevelTwoVo) {
+        if (user == null) {
+            DiaLogUtils.showPromptLoginDialog(this);
+            return;
+        }
+        boolean b = articleCommentLevelTwoVo.getReplyUser().getId() == user.getUserId();
+        optionSupport.setOnClickListener(v -> {
+            articleCommentLevelTwoAdapter.supportOrUnSupportComment(articleCommentLevelTwoVo,()->optionDialog.dismiss());
+        });
+        optionReply.setOnClickListener(v -> {
+            optionDialog.dismiss();
+            showReplyDialog(3, articleCommentLevelTwoVo.getAnswerCommentLevelTwo().getLevelOneId(), articleCommentLevelTwoVo.getUserReplyTo());
+        });
+        if (b) {
+            optionDelete.setBackground(getDrawable(R.drawable.shape_radius_right_delete));
+            optionDelete.setOnClickListener(v -> {
+
+            });
+        } else {
+            optionDelete.setVisibility(View.GONE);
+            optionReply.setBackground(getDrawable(R.drawable.shape_radius_right_reply));
+        }
+        optionDialog.show();
+    }
+
+    /*
+     * 获取当前回答评论数据
+     * */
+    private void getCommentLevelOne() {
+        refreshLayout.setRefreshing(true);
+        Long userId = user == null ? -1 : user.getUserId();
+        String url = serverLocation + "/CommentService/ArticleComment/LevelOne/" + articleId + "/" + userId + "/" + commentHolder.getLimit();
+        RequestUtils.sendSimpleRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(ArticleActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(() -> {
+                    if (simpleDto.isSuccess()) {
+                        Object object = simpleDto.getObject();
+                        List list = gson.fromJson(gson.toJson(object), List.class);
+                        List<ArticleCommentLevelOneVo> res = new ArrayList<>(list.size());
+                        for (Object o : list) {
+                            res.add(gson.fromJson(gson.toJson(o), ArticleCommentLevelOneVo.class));
+                        }
+                        loadCommentLevelOneFinish(res);
+                    }
+                });
+            }
+        });
+    }
+
+    private void loadCommentLevelOneFinish(List<ArticleCommentLevelOneVo> res) {
+        if (!commentHolder.isLoad()) {
+            commentHolder.setLoad(true);
+            level1.setVisibility(View.VISIBLE);
+            level2.setVisibility(View.GONE);
+        }
+        refreshLayout.setRefreshing(false);
+        if (res.size() == 0 || res.size() < 10) {
+            Toast.makeText(ArticleActivity.this, "没有更多了", Toast.LENGTH_SHORT).show();
+        }
+        if (res.size() == 0) return;
+        commentHolder.addLimit(res.size());
+        articleCommentLevelOneVos.addAll(res);
+        commentLevel1Adapter.notifyDataSetChanged();
+    }
+
+    //  显示"菜单"对话框，并判断是否本人操作？显示"删除评论"选项，否则不显示
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void showOptionDialog(ArticleCommentLevelOneVo articleCommentLevelOneVo) {
+        if (user == null) {
+            DiaLogUtils.showPromptLoginDialog(this);
+            return;
+        }
+        boolean b = articleCommentLevelOneVo.getUser().getId() == user.getUserId();
+        optionSupport.setOnClickListener(v -> {
+            commentLevel1Adapter.supportOrUnSupportComment(articleCommentLevelOneVo,()->optionDialog.dismiss());
+        });
+        optionReply.setOnClickListener(v -> {
+            optionDialog.dismiss();
+            showReplyDialog(2, articleCommentLevelOneVo.getArticleCommentLevelOne().getId(), articleCommentLevelOneVo.getUser());
+        });
+        if (b) {
+            optionDelete.setBackground(getDrawable(R.drawable.shape_radius_right_delete));
+            optionDelete.setOnClickListener(v -> {
+                deleteCommentLevelOne(articleCommentLevelOneVo);
+            });
+        } else {
+            optionDelete.setVisibility(View.GONE);
+            optionReply.setBackground(getDrawable(R.drawable.shape_radius_right_reply));
+        }
+        optionDialog.show();
+    }
+
+    /*
+     * 由一级评论点击"查看回复"回调此方法，并传递一级评论id
+     * */
+    private void toCommentLevel2(Long id) {
+        showLevelTwo();
+        level2.setAdapter(articleCommentLevelTwoAdapter);
+        level2.setLayoutManager(new LinearLayoutManager(this));
+        //修改图标
+        TextView close = dialogView.findViewById(R.id.acd_close);
+        close.setBackground(getResources().getDrawable(R.drawable.icon_back_lv1));
+        getCommentLevelTwo(id, list -> {
+            if (list.size() == 0)
+                return;
+            if (list.size() < 10)
+                Toast.makeText(ArticleActivity.this, "没有更多内容了", Toast.LENGTH_SHORT).show();
+            commentLevelTwoVos.addAll(list);
+            commentLevelTwoLimit += list.size();
+            articleCommentLevelTwoAdapter.notifyDataSetChanged();
+        });
+
+    }
+
+    private void getCommentLevelTwo(Long id, Consumer<List<ArticleCommentLevelTwoVo>> callback) {
+        Long userId = user == null ? -1 : user.getUserId();
+        String url = serverLocation + "/CommentService/ArticleComment/LevelTwo/" + id + "/" + userId + "/" + commentLevelTwoLimit;
+        RequestUtils.sendSimpleRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Toast.makeText(ArticleActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(() -> {
+                    if (simpleDto.isSuccess()) {
+                        List list = gson.fromJson(gson.toJson(simpleDto.getObject()), List.class);
+                        List<ArticleCommentLevelTwoVo> res = new ArrayList<>(list.size());
+                        for (Object o : list) {
+                            res.add(gson.fromJson(gson.toJson(o), ArticleCommentLevelTwoVo.class));
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            callback.accept(res);
+                        }
+                    } else {
+                        Toast.makeText(ArticleActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    /*
+     * 删除一级评论
+     * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void deleteCommentLevelOne(ArticleCommentLevelOneVo articleCommentLevelOneVo) {
+        optionDelete.setEnabled(false);
+        String url = serverLocation + "/CommentService/ArticleComment/LevelOne";
+        Map<String,String> params = new HashMap<>(1);
+        params.put("commentId",String.valueOf(articleCommentLevelOneVo.getArticleCommentLevelOne().getId()));
+        RequestUtils.deleteWithParams(url, params, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(()-> {
+                    Toast.makeText(ArticleActivity.this, "请求失败", Toast.LENGTH_SHORT).show();
+                    optionDelete.setEnabled(true);
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        articleCommentLevelOneVos.remove(articleCommentLevelOneVo);
+                        commentLevel1Adapter.notifyDataSetChanged();
+                        optionDialog.dismiss();
+                        optionDelete.setEnabled(true);
+                    }else{
+                        Toast.makeText(ArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                        optionDelete.setEnabled(true);
+                    }
+                });
+            }
+        });
+
+    }
+
+    /*
+     * 获取文章内容
+     * */
+    private void getContent(Consumer<ArticleVo> consumer) {
+        Long uId = user != null ? user.getUserId() : -1;
+        String url = serverLocation + "/ArticleService/Article/" + recommendViewBean.getContentId() + "/" + recommendViewBean.getUserId() + "/" + uId;
+        RequestUtils.sendSimpleRequest(url, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(()->Toast.makeText(ArticleActivity.this,"请求失败",Toast.LENGTH_SHORT).show());
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        ArticleVo articleVo = gson.fromJson(gson.toJson(simpleDto.getObject()), ArticleVo.class);
+                        consumer.accept(articleVo);
+                    }else
+                        Toast.makeText(ArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    /*
+     * 初始化评论提示框
+     * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void initCommentDialog() {
+        dialogView = AnswerCommentDialogView.getView(this);
+        refreshLayout = dialogView.findViewById(R.id.acd_swipeRefreshLayout);
+        refreshLayout.setEnabled(false);
+        level1 = dialogView.findViewById(R.id.acd_recyclerview_level_one);
+        level2 = dialogView.findViewById(R.id.acd_recyclerview_level_two);
+        dialog = new BottomSheetDialog(this);
+        dialog.setContentView(dialogView);
+        dialog.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        behavior = BottomSheetBehavior.from((View) dialogView.getParent());
+        behavior.setPeekHeight(getPeekHeight());
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if (i == BottomSheetBehavior.STATE_HIDDEN) {
+                    dialog.dismiss();
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+            }
+        });
+        initDialogView();
+    }
+
+    /*
+     * 初始化“评论”提示框View
+     * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void initDialogView() {
+        TextView close = dialogView.findViewById(R.id.acd_close);
+        TextView editText = dialogView.findViewById(R.id.acd_write_comment);
+        close.setOnClickListener(v -> {
+            if (inLevelOne) {
+                dialog.dismiss();
+            } else {
+                showLevelOne();
+                close.setBackground(getResources().getDrawable(R.drawable.icon_close_activity));
+                lv1ToLv2 = null;
+
+            }
+        });
+        editText.setOnClickListener(v -> {
+            if (user == null) {
+                DiaLogUtils.showPromptLoginDialog(this);
+            } else {
+                User user = inLevelOne ? author : lv1ToLv2.getUser();
+                showReplyDialog(inLevelOne ? 1 : 2, inLevelOne ? recommendViewBean.getContentId() : lv1ToLv2.getArticleCommentLevelOne().getId(), user);
+            }
+        });
+    }
+
+
+    /*
+     * 显示"回复"对话框，并传递回复对象
+     * @code: 1-针对回答回复 2-针对一级评论回复 3-针对二级评论回复
+     * @answerIdOrCommentId: 如果针对回答回复，则传递回答的id，为一级评论
+     * @replyObject: 被回复对象
+     * */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void showReplyDialog(int code, Long answerIdOrCommentId, User replyObject) {
+        replyDialog.show();
+        replyEditText.setFocusable(true);
+        replyEditText.setFocusableInTouchMode(true);
+        replyEditText.requestFocus();
+
+        replyObjectName.setText(replyObject.getUserName());
+        if (code == 1) {
+            replyTitle.setText("评论给 ");
+            submitReply.setOnClickListener(v -> {
+                String url = serverLocation + "/CommentService/ArticleComment/LevelOne";
+                Map<String, String> map = new HashMap<>();
+                map.put("articleId", String.valueOf(answerIdOrCommentId));
+                map.put("userId", String.valueOf(user.getUserId()));
+                map.put("content", replyEditText.getText().toString());
+                RequestUtils.postWithParams(url, map, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Toast.makeText(ArticleActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                        runOnUiThread(() -> {
+                            if (simpleDto.isSuccess()) {
+                                Toast.makeText(ArticleActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(ArticleActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
+                            }
+                            replyEditText.setText("");
+                            replyDialog.dismiss();
+                        });
+                    }
+                });
+            });
+        } else {
+            replyTitle.setText("回复给 ");
+            submitReply.setOnClickListener(v -> {
+                String content = replyEditText.getText().toString();
+                if (StringUtils.isEmpty(content)) {
+                    Toast.makeText(ArticleActivity.this,"评论不能为空",Toast.LENGTH_SHORT).show();
+                } else {
+                    String url = serverLocation + "/CommentService/ArticleComment/LevelTwo";
+                    Map<String, String> map = new HashMap<>();
+                    map.put("levelOneId", String.valueOf(answerIdOrCommentId));
+                    map.put("replyUserId", String.valueOf(user.getUserId()));
+                    map.put("replyToUserId", String.valueOf(replyObject.getId()));
+                    map.put("content", content);
+                    RequestUtils.postWithParams(url, map, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Toast.makeText(ArticleActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
+                            runOnUiThread(() -> {
+                                Toast.makeText(ArticleActivity.this, simpleDto.getMsg(), Toast.LENGTH_SHORT).show();
+                                replyEditText.setText("");
+                                replyDialog.dismiss();
+                            });
+                        }
+                    });
+                }
+
+            });
+        }
+    }
+
+        //初始化"回复"对话框
+    private void initReplyDialog() {
+        replyView = View.inflate(this, R.layout.answer_comment_reply_dialog, null);
+        replyDialog = new BottomSheetDialog(this);
+        replyDialog.setContentView(replyView);
+        replyDialog.getWindow().findViewById(R.id.design_bottom_sheet).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        behavior = BottomSheetBehavior.from((View) replyView.getParent());
+        behavior.setPeekHeight(getPeekHeight());
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if (i == BottomSheetBehavior.STATE_HIDDEN) {
+                    replyDialog.dismiss();
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+            }
+        });
+
+        replyEditText = replyView.findViewById(R.id.acrd_edit_text);
+        replyTitle = replyView.findViewById(R.id.acrd_title);
+        replyObjectName = replyView.findViewById(R.id.acrd_user_reply_to);
+        submitReply = replyView.findViewById(R.id.acrd_submit);
+    }
+
+
+    private void initToolBar() {
         Toolbar toolbar = findViewById(article_tool_bar);
+        toolbar.setTitle(recommendViewBean.getTitle());
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v-> finish());
         ActionBar supportActionBar = getSupportActionBar();
         if(supportActionBar != null){
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
-        TextView content = findViewById(R.id.aa_content);
-        content.setText(Html.fromHtml("<h2 style=\"color: rgb(68, 68, 68); font-family: inherit; font-style: inherit; font-variant: inherit; background-color: rgb(255, 255, 255); margin: 0px 0px 1.16667em; font-stretch: inherit; font-size: 1.2em; line-height: 1.5; clear: left;\">连美军特种部队也派人造<span class=\"SearchEntity-Wrapper\"><a class=\"SearchEntity\" href=\"https://www.zhihu.com/search?q=%E5%8F%A3%E7%BD%A9&amp;source=Entity&amp;hybrid_search_source=Entity&amp;hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A1135815571%7D\" data-za-not-track-link=\"true\" data-za-detail-view-path-module=\"EntitySearchWordItem\" data-za-detail-view-path-module_name=\"人工\" style=\"text-decoration-line: none;\"><span class=\"SearchEntity-text\" style=\"color: rgb(23, 81, 153);\">口罩</span><svg class=\"Icon Icon--SearchEntity SearchEntity-icon\" width=\"15\" height=\"15\" viewBox=\"0 0 15 15\" fill=\"currentColor\"><path d=\"M10.89 9.477l3.06 3.059a1 1 0 0 1-1.414 1.414l-3.06-3.06a6 6 0 1 1 1.414-1.414zM6 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z\"></path></svg></a></span>了，可产量却。。。</h2><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据美国国防部网站3日消息，为了解决美国防疫物资短缺，美国陆军特种部队等多个单位，开始派兵参与口罩生产。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div class=\"ImageLoader-imageWrapper\" style=\"position: relative;\"><img data-size=\"normal\" data-rawwidth=\"1080\" data-rawheight=\"407\" data-default-watermark-src=\"https://pic2.zhimg.com/50/v2-782f1d19d887ed67205a1841e16c858d_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-7ac732248b4db129fa32965079aeca0d_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-7ac732248b4db129fa32965079aeca0d_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-7ac732248b4db129fa32965079aeca0d_1440w.webp\" class=\"ImageLoader-image loaded origin_image zh-lightbox-thumb lazy\" src=\"https://pic1.zhimg.com/80/v2-7ac732248b4db129fa32965079aeca0d_1440w.webp\" style=\"width: 361px; height: 136.044px; object-fit: cover; display: block; max-width: 100%; margin: 0px auto; background-color: transparent; cursor: zoom-in;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：美国国防部官网</figcaption></figure><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">报道称，美军第一特种作战群下辖部队已在基地开始生产口罩等防疫物资，供物资短缺的前线医护人员使用。目前，这些物资将供应军队医院和地方合作机构。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div class=\"ImageLoader-imageWrapper\" style=\"position: relative;\"><img data-size=\"normal\" data-rawwidth=\"783\" data-rawheight=\"527\" data-default-watermark-src=\"https://pic1.zhimg.com/50/v2-d7c49cfd7b54c8a1335fae8116da9b2e_hd.jpg\" data-original=\"https://pic2.zhimg.com/v2-e9eee6930613104f784468e485b8ba1b_r.jpg\" data-actualsrc=\"https://pic2.zhimg.com/50/v2-e9eee6930613104f784468e485b8ba1b_hd.jpg\" data-src=\"https://pic2.zhimg.com/80/v2-e9eee6930613104f784468e485b8ba1b_1440w.webp\" class=\"ImageLoader-image loaded origin_image zh-lightbox-thumb lazy\" src=\"https://pic2.zhimg.com/80/v2-e9eee6930613104f784468e485b8ba1b_1440w.webp\" style=\"width: 361px; height: 242.972px; object-fit: cover; display: block; max-width: 100%; margin: 0px auto; background-color: transparent; cursor: zoom-in;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">美军士兵正在操作缝纫机，图源：美国国防部官网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据称，生产工作主要由该部队集团支援营负责，转产用的缝纫机来自负责修补降落伞的部门。据美国广播公司（ABC）新闻频道称，该部队目前的主攻方向，是运用3D打印技术生产防护面罩、生产可重复使用的N95口罩，以及研究加大产能的相关事宜。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"992\" data-rawheight=\"558\" data-default-watermark-src=\"https://pic4.zhimg.com/50/v2-0d0814934f7e290c769dd67ea03f09b3_hd.jpg\" data-original=\"https://pic2.zhimg.com/v2-01ed80d24db4606dc1083583ca54cba1_r.jpg\" data-actualsrc=\"https://pic2.zhimg.com/50/v2-01ed80d24db4606dc1083583ca54cba1_hd.jpg\" data-src=\"https://pic2.zhimg.com/80/v2-01ed80d24db4606dc1083583ca54cba1_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 203.062px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">操作3D打印设备的美军士兵，图源：ABC新闻网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">在ABC新闻的报道中，这位集团支援营营长认为，该部队目前的工作<span style=\"font-weight: 700;\">“对帮助医护人员和美国同胞来说，是一次非凡的努力。”他还表示，这对锻炼部队学习创造性解决问题而言，是一次值得的演练。</span></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\"><span style=\"font-weight: 700;\">“尤其是美军拥有全世界最强大的实力。”这位营长说。</span></p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"858\" data-rawheight=\"251\" data-default-watermark-src=\"https://pic3.zhimg.com/50/v2-0dd9620cdc4b28b1d0c54aa80cd8bdec_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-635e605f1837e18fed8e5221dc0b677e_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-635e605f1837e18fed8e5221dc0b677e_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-635e605f1837e18fed8e5221dc0b677e_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 105.607px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：ABC新闻网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">但从国防部和ABC新闻提供的数据看，在该部队动用了各项新技术后，产量仍低得尴尬。</p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\"><span style=\"font-weight: 700;\">“空中运输排一天能生产200个口罩，最开始，我们只有5台轻型缝纫机。但我们会努力争取每周能造1000-1500个”这个营长如是说。</span></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">相比之下，此前兰博基尼汽车公司在改组生产线后，手工口罩日产量为1000只。</p><figure data-size=\"normal\" style=\"margin: 1.4em auto; color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); position: relative; width: 361px;\"><div><div data-delayed-content-image=\"true\" data-size=\"normal\" data-rawwidth=\"906\" data-rawheight=\"407\" data-default-watermark-src=\"https://pic2.zhimg.com/50/v2-df2f8cd5686ce37d8f03c9cdac1f46e9_hd.jpg\" data-original=\"https://pic1.zhimg.com/v2-09f0a31cd9a878848716c4b070da471d_r.jpg\" data-actualsrc=\"https://pic1.zhimg.com/50/v2-09f0a31cd9a878848716c4b070da471d_hd.jpg\" data-src=\"https://pic1.zhimg.com/80/v2-09f0a31cd9a878848716c4b070da471d_1440w.webp\" class=\"ImageLoader-container origin_image zh-lightbox-thumb lazy\" style=\"margin: 0px auto; position: relative; overflow: hidden; background-color: rgba(26, 26, 26, 0.05); max-width: 100%; width: 361px; cursor: zoom-in; height: 162.171px;\"></div></div><figcaption style=\"margin-top: 0.66667em; padding: 0px 1em; font-size: 0.9em; line-height: 1.5; text-align: center; color: rgb(153, 153, 153);\">图源：美国国防部官网</figcaption></figure><p class=\"ztext-empty-paragraph\" style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: -0.8em 0px;\"><br></p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">据美国军方相关网站介绍，美国第一特种作战群的集团支援营，主要工作是负责特战群作战时架设基地、维修生产等后方支援任务。</p><p style=\"color: rgb(68, 68, 68); font-family: -apple-system, BlinkMacSystemFont, &quot;Helvetica Neue&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Source Han Sans SC&quot;, &quot;Noto Sans CJK SC&quot;, &quot;WenQuanYi Micro Hei&quot;, sans-serif; font-size: 16px; background-color: rgb(255, 255, 255); margin: 1.4em 0px;\">在介绍文件里，该部队自称有效减少了官僚主义对支援工作的干涉，一切从实战出</p>"));
+    }
+
+    private void changeSupportButton(ArticleToken articleToken){
+        if(articleToken.isSupport())
+            changeButtonToSupport(articleToken);
+        else
+            changeButtonToUnSupport(articleToken);
+    }
+
+    private void changeButtonToSupport(ArticleToken articleToken){
+        support.setBackground(getResources().getDrawable(R.drawable.support_button_background));
+        support.setTextColor(getResources().getColor(R.color.white));
+        support.setText(articleToken.getSupportSum()+"赞同");
+        supportTriangle.setBackground(getResources().getDrawable(R.drawable.icon_triangle_white));
+    }
+    private void changeButtonToUnSupport(ArticleToken articleToken){
+        support.setBackground(getResources().getDrawable(R.drawable.un_support_button_background));
+        support.setTextColor(getResources().getColor(R.color.ZhiHuBlue));
+        support.setText(articleToken.getSupportSum()+"赞同");
+        supportTriangle.setBackground(getResources().getDrawable(R.drawable.icon_triangle_blue));
+    }
+
+    private void showLevelTwo() {
+        inLevelOne = false;
+        level1.setVisibility(View.GONE);
+        level2.setVisibility(View.VISIBLE);
+    }
+
+    private void buttonControl(boolean b) {
+        support.setClickable(b);
+        collect.setClickable(b);
+//        comment.setClickable(b);
+    }
+
+    private void showLevelOne() {
+        inLevelOne = true;
+        level1.setVisibility(View.VISIBLE);
+        level2.setVisibility(View.GONE);
+    }
+    
+    protected int getPeekHeight() {
+        return getResources().getDisplayMetrics().heightPixels;
+        /*//设置弹窗高度为屏幕高度的3/4
+        return peekHeight - (peekHeight / 4);*/
+    }
+    @Override
+    protected void onDestroy() {
+        dialog.dismiss();
+        replyDialog.dismiss();
+        optionDialog.dismiss();
+        ((ViewGroup) dialogView.getParent()).removeView(dialogView);
+        ((ViewGroup) replyView.getParent()).removeView(replyView);
+        ((ViewGroup) optionView.getParent()).removeView(optionView);
+        super.onDestroy();
+    }
+}
+
+class ArticleToken{
+    private boolean isSupport;
+    private boolean isAttention;
+    private Long supportSum;
+
+    public ArticleToken() {}
+
+    public ArticleToken(boolean isSupport,boolean isAttention, Long supportSum) {
+        this.isSupport = isSupport;
+        this.isAttention = isAttention;
+        this.supportSum = supportSum;
+    }
+
+    public void support(){
+        this.isSupport = true;
+        this.supportSum++;
+    }
+
+    public void unSupport(){
+        this.isSupport = false;
+        this.supportSum--;
+    }
+
+    public void reverseSupport(){
+        if(isSupport)
+            unSupport();
+        else
+            support();
+    }
+
+    public void attention(){
+        this.isAttention = true;
+    }
+
+    public void cancelAttention(){
+        this.isAttention = false;
+    }
+
+    public boolean isSupport() {
+        return isSupport;
+    }
+
+    public void setSupport(boolean support) {
+        isSupport = support;
+    }
+
+    public boolean isAttention() {
+        return isAttention;
+    }
+
+    public void setAttention(boolean attention) {
+        isAttention = attention;
+    }
+
+    public Long getSupportSum() {
+        return supportSum;
+    }
+
+    public void setSupportSum(Long supportSum) {
+        this.supportSum = supportSum;
     }
 }

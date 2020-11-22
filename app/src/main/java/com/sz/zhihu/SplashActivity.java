@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.transition.Explode;
 
 import com.sz.zhihu.utils.SystemUtils;
+import com.sz.zhihu.vo.RecommendViewBean;
 
 /*
  * 启动页
@@ -21,6 +22,13 @@ public class SplashActivity extends AbstractCustomActivity {
     }
 
     private void jumpPage() {
+        RecommendViewBean recommendViewBean = new RecommendViewBean(1117l, 4l, 31l, 1, 0, "抢大熊猫的竹子吃犯法吗？", "LinRuiXin", "158581734675531.png", "植发话题下优秀答者", null, 0l, 0l);
+        Intent intent = new Intent(this, AnswerActivity.class);
+        intent.putExtra("viewBean", recommendViewBean);
+        startActivity(intent);
+    }
+
+    /*private void jumpPage() {
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
@@ -34,5 +42,6 @@ public class SplashActivity extends AbstractCustomActivity {
                 e.printStackTrace();
             }
         }).start();
-    }
+    }*/
+
 }

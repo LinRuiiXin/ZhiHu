@@ -21,14 +21,12 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.sz.zhihu.R;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.po.AnswerCommentLevelTwo;
+import com.sz.zhihu.po.ArticleCommentLevelTwo;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DBUtils;
-import com.sz.zhihu.utils.DateProcessor;
 import com.sz.zhihu.utils.RequestUtils;
-import com.sz.zhihu.vo.AnswerCommentLevelOneVo;
 import com.sz.zhihu.vo.AnswerCommentLevelTwoVo;
-
-import org.w3c.dom.Text;
+import com.sz.zhihu.vo.ArticleCommentLevelTwoVo;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,15 +38,15 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class AnswerCommentLevelTwoAdapter extends RecyclerView.Adapter {
+public class ArticleCommentLevelTwoAdapter extends RecyclerView.Adapter {
 
-    private List<AnswerCommentLevelTwoVo> data;
-    private Context context;
+    private final Context context;
+    private final List<ArticleCommentLevelTwoVo> data;
     private final LayoutInflater inflater;
     private final String serverLocation;
-    private final Consumer<AnswerCommentLevelTwoVo> consumer;
+    private final Consumer<ArticleCommentLevelTwoVo> consumer;
 
-    public AnswerCommentLevelTwoAdapter(Context context, List<AnswerCommentLevelTwoVo> data, Consumer<AnswerCommentLevelTwoVo> consumer){
+    public ArticleCommentLevelTwoAdapter(Context context, List<ArticleCommentLevelTwoVo> data, Consumer<ArticleCommentLevelTwoVo> consumer){
         this.context = context;
         this.data = data;
         inflater = LayoutInflater.from(context);
@@ -67,27 +65,27 @@ public class AnswerCommentLevelTwoAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof ViewHolder){
             ViewHolder viewHolder = (ViewHolder) holder;
-            AnswerCommentLevelTwoVo answerCommentLevelTwoVo = data.get(position);
-            User replyUser = answerCommentLevelTwoVo.getReplyUser();
-            User userReplyTo = answerCommentLevelTwoVo.getUserReplyTo();
-            AnswerCommentLevelTwo answerCommentLevelTwo = answerCommentLevelTwoVo.getAnswerCommentLevelTwo();
+            ArticleCommentLevelTwoVo articleCommentLevelTwoVo = data.get(position);
+            User replyUser = articleCommentLevelTwoVo.getReplyUser();
+            User userReplyTo = articleCommentLevelTwoVo.getUserReplyTo();
+            ArticleCommentLevelTwo articleCommentLevelTwo = articleCommentLevelTwoVo.getAnswerCommentLevelTwo();
             String url = serverLocation + "/res/User/" + replyUser.getId() + "/" + replyUser.getPortraitFileName();
             Glide.with(context).load(url).into(viewHolder.portrait);
             viewHolder.replyUser.setText(replyUser.getUserName());
             viewHolder.replyTo.setText(userReplyTo.getUserName());
-            viewHolder.content.setText(answerCommentLevelTwo.getContent());
-            viewHolder.supportSum.setText(answerCommentLevelTwo.getSupportSum()+"");
-            if (answerCommentLevelTwoVo.isSupport()) {
-                toSupport(answerCommentLevelTwoVo,viewHolder);
+            viewHolder.content.setText(articleCommentLevelTwo.getContent());
+            viewHolder.supportSum.setText(articleCommentLevelTwo.getSupportSum()+"");
+            if (articleCommentLevelTwoVo.isSupport()) {
+                toSupport(articleCommentLevelTwoVo,viewHolder);
             }else{
-                toUnSupport(answerCommentLevelTwoVo,viewHolder);
+                toUnSupport(articleCommentLevelTwoVo,viewHolder);
             }
             viewHolder.itemView.setOnClickListener(v->{
-                consumer.accept(answerCommentLevelTwoVo);
+                consumer.accept(articleCommentLevelTwoVo);
             });
             viewHolder.support.setOnClickListener(v -> {
                 viewHolder.support.setClickable(false);
-                supportOrUnSupportComment(answerCommentLevelTwoVo,()->viewHolder.support.setClickable(true));
+                supportOrUnSupportComment(articleCommentLevelTwoVo,()->viewHolder.support.setClickable(true));
             });
         }
     }
@@ -97,12 +95,11 @@ public class AnswerCommentLevelTwoAdapter extends RecyclerView.Adapter {
      * @vo 二级评论vo
      * @callBack 点赞或取消点赞调用后回调函数，你可以做一些如：让按钮恢复可点击或隐藏菜单栏之类的操作
      * */
-
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void supportOrUnSupportComment(AnswerCommentLevelTwoVo vo, Runnable callBack) {
+    public void supportOrUnSupportComment(ArticleCommentLevelTwoVo vo, Runnable callBack) {
         boolean support = vo.isSupport();
         String api = support ? "/UnSupport" : "/Support";
-        String url = serverLocation + "/CommentService/AnswerComment/LevelTwo" + api;
+        String url = serverLocation + "/CommentService/ArticleComment/LevelTwo/" + api;
         Map<String,String> params = new HashMap(2);
         params.put("replyId",String.valueOf(vo.getAnswerCommentLevelTwo().getId()));
         params.put("userId",String.valueOf(DBUtils.queryUserHistory().getUserId()));
@@ -135,13 +132,13 @@ public class AnswerCommentLevelTwoAdapter extends RecyclerView.Adapter {
         });
     }
 
-    private void toSupport(AnswerCommentLevelTwoVo vo, AnswerCommentLevelTwoAdapter.ViewHolder viewHolder) {
+    private void toSupport(ArticleCommentLevelTwoVo vo,ViewHolder viewHolder) {
         viewHolder.supportSum.setText(String.valueOf(vo.getAnswerCommentLevelTwo().getSupportSum()));
         viewHolder.supportSum.setTextColor(context.getResources().getColor(R.color.ZhiHuBlue));
         viewHolder.supportBtn.setBackground(context.getDrawable(R.drawable.icon_support_blue));
     }
 
-    private void toUnSupport(AnswerCommentLevelTwoVo vo, AnswerCommentLevelTwoAdapter.ViewHolder viewHolder) {
+    private void toUnSupport(ArticleCommentLevelTwoVo vo,ViewHolder viewHolder) {
         viewHolder.supportSum.setText(String.valueOf(vo.getAnswerCommentLevelTwo().getSupportSum()));
         viewHolder.supportSum.setTextColor(context.getResources().getColor(R.color.TextDefaultColor));
         viewHolder.supportBtn.setBackground(context.getDrawable(R.drawable.icon_support_gray));
@@ -149,11 +146,9 @@ public class AnswerCommentLevelTwoAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return data == null ? 0 : data.size();
+        return data.size();
     }
-
     class ViewHolder extends RecyclerView.ViewHolder{
-
         private final RoundedImageView portrait;
         private final TextView replyTo;
         private final TextView replyUser;

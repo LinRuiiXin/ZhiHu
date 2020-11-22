@@ -66,6 +66,7 @@ public class RequestUtils {
             builder.addFormDataPart(fileName, file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
         }
         params.keySet().forEach(key->{
+            System.out.println(key);
             builder.addFormDataPart(key,params.get(key));
         });
         MultipartBody requestBody = builder.build();

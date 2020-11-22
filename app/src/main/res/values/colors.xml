@@ -13,4 +13,5 @@
     <color name="ButtonDefaultColor">#DCDCDC</color>
     <color name="editorBackground">#EDEDED</color>
     <color name="textColorDisable">#ACACAC</color>
+    <color name="questionDescribeBackground">#f4f4f4</color>
 </resources>

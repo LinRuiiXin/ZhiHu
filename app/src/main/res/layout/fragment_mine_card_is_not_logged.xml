@@ -25,7 +25,7 @@
         android:layout_below="@+id/mine_card_nl_title"
         android:layout_marginTop="10dp"
         android:text="登录"
-        android:background="@drawable/login_button_shape"
+        android:background="@drawable/blue_button_with_ripple"
         android:textColor="#EFEFEF"
         />
     <LinearLayout

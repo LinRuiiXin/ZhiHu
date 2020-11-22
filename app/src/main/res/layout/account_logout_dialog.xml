@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_general_background"
+    android:padding="30dp"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ald_logout"
+        android:text="退出登录"
+        android:background="@drawable/login_button_shape"
+        android:clickable="true"
+        android:gravity="center"
+        android:textColor="#fff"
+        android:padding="20dp"
+        />
+</RelativeLayout>

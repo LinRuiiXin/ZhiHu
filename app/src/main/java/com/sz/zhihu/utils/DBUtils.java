@@ -29,6 +29,11 @@ public class DBUtils {
             return false;
         }
     }
+
+    public static void clearUserHistory(){
+        DataSupport.deleteAll(User.class);
+    }
+
     public static int getBrowseRecordCount(){
         int count = DataSupport.count(RecommendViewBean.class);
         return count;
@@ -37,4 +42,5 @@ public class DBUtils {
         List<RecommendViewBean> recommendViewBeans = DataSupport.order("id desc").limit(10).offset(index).find(RecommendViewBean.class);
         return recommendViewBeans;
     }
+
 }

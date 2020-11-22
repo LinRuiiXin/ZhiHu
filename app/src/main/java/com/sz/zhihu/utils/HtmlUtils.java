@@ -53,12 +53,12 @@ public class HtmlUtils {
     }
     /**
      * 获取html字符串中的文字内容（去掉标签）
-     * @param htmlcontent
+     * @param htmlContent
      * @return
      */
-    public static String getContentFromHtml(String htmlcontent){
-        if(htmlcontent!=null){
-            return htmlcontent.replaceAll("<\\/?.+?>", "");
+    public static String getContentFromHtml(String htmlContent){
+        if(htmlContent!=null){
+            return htmlContent.replaceAll("<\\/?.+?>", "");
         }
         return "";
     }

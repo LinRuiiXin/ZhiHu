@@ -1,10 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <com.sz.zhihu.compoent.RichEditor
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/editorBackground"
+    >
+
+    <RelativeLayout
+        android:id="@+id/aea_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+
+        <TextView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/aea_close"
+            android:background="@drawable/icon_back_lv1"
+            android:padding="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:id="@+id/aea_submit"
+            android:text="发布"
+            android:textColor="@color/ZhiHuBlue" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/aea_title"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/aea_bar"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:background="@null"
+        android:hint="请输入标题"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+
+    <com.rex.editor.view.RichEditorNew
+        android:id="@+id/aea_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/aea_rich_editor"
-        />
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="120dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/edit_edit_area_shape"
+        android:gravity="left"
+        android:textSize="17dp"
+        android:windowSoftInputMode="adjustPan|stateHidden" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/edit_bottom_setting_shape"
+        android:orientation="horizontal"
+        android:windowSoftInputMode="adjustPan|stateHidden"
+        >
+
+        <Button
+            android:id="@+id/aea_button_bold"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="B"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/aea_button_italic"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="B"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/aea_button_title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="^"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/aea_button_order"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="1...\n2...\n3..."
+            android:textSize="5dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/aea_button_photo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="Photo"
+            android:textSize="8dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/aea_button_video"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="Video"
+            android:textSize="8dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/aea_button_divider"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="----" />
+
+    </LinearLayout>
 </RelativeLayout>

@@ -118,7 +118,7 @@ public class LoginActivity extends AbstractCustomActivity {
             String password = this.password.getText().toString();
             if(ValidateUtil.validate(mail,ValidateUtil.mailRegex)){
                 if(ValidateUtil.validate(password,ValidateUtil.passwordRegex)){
-                    String url = serverLocation + "/Login/"+mail+"/"+password;
+                    String url = serverLocation + "/UserService/User/Login/"+mail+"/"+password;
                     RequestUtils.sendSimpleRequest(url, new Callback() {
                         @Override
                         public void onFailure(Call call, IOException e) {

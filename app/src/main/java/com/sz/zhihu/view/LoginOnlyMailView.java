@@ -53,7 +53,7 @@ public class LoginOnlyMailView {
                     senMail.setOnClickListener(v->{
                         String mailNow = mail.getText().toString();
                         if(ValidateUtil.validate(mailNow,ValidateUtil.mailRegex)){
-                            String url = serverLocation + "/Login/SecurityCode/"+mailNow;
+                            String url = serverLocation + "/UserService/User/Login/SecurityCode/"+mailNow;
                             RequestUtils.sendSimpleRequest(url, new Callback() {
                                 @Override
                                 public void onFailure(Call call, IOException e) {
@@ -82,7 +82,7 @@ public class LoginOnlyMailView {
                         if(ValidateUtil.validate(MailLoginDialog.mail,ValidateUtil.mailRegex)){
                             String codeStr = code.getText().toString();
                             if(codeStr.length() == 6){
-                                String url = serverLocation + "/Login/NoPassword/"+ MailLoginDialog.mail+"/"+codeStr ;
+                                String url = serverLocation + "/UserService/User/Login/NoPassword/"+ MailLoginDialog.mail+"/"+codeStr ;
                                 RequestUtils.sendSimpleRequest(url, new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {

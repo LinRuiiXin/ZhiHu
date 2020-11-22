@@ -18,8 +18,6 @@ public class HomePageActivity extends AbstractCustomActivity {
     }
 
     private void initView() {
-        top = findViewById(R.id.top);
-        mScrollLayout = findViewById(R.id.why);
-        mScrollLayout.setHeader(top);
+        
     }
 }

@@ -1,6 +1,7 @@
 package com.sz.zhihu;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -66,7 +68,7 @@ import okhttp3.Response;
 import static com.sz.zhihu.R.id.answer_tool_bar;
 
 public class AnswerActivity extends AbstractCustomActivity {
-
+    public static final int TO_QUESTION_CODE = 3;
     private ViewPager viewPager;
     private List<Fragment> fragments;
     private String serverLocation;
@@ -138,6 +140,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         initViewPager();
         comment.setOnClickListener(commentClickListener());
         support.setOnClickListener(supportListener());
+        buttonControl(false);
     }
 
 
@@ -283,7 +286,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void deleteCommentLevelOne(AnswerCommentLevelOneVo answerCommentLevelOneVo) {
         optionDelete.setEnabled(false);
-        String url = serverLocation + "/CommentService/Comment/LevelOne";
+        String url = serverLocation + "/CommentService/AnswerComment/LevelOne";
         Map<String,String> params = new HashMap<>(1);
         params.put("commentId",String.valueOf(answerCommentLevelOneVo.getCommentLevelOne().getId()));
         RequestUtils.deleteWithParams(url, params, new Callback() {
@@ -386,7 +389,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         if (code == 1) {
             replyTitle.setText("评论给 ");
             submitReply.setOnClickListener(v -> {
-                String url = serverLocation + "/CommentService/Comment/LevelOne";
+                String url = serverLocation + "/CommentService/AnswerComment/LevelOne";
                 Map<String, String> map = new HashMap<>();
                 map.put("answerId", String.valueOf(answerIdOrCommentId));
                 map.put("userId", String.valueOf(user.getUserId()));
@@ -419,7 +422,7 @@ public class AnswerActivity extends AbstractCustomActivity {
                 if (StringUtils.isEmpty(content)) {
                     Toast.makeText(AnswerActivity.this,"评论不能为空",Toast.LENGTH_SHORT).show();
                 } else {
-                    String url = serverLocation + "/CommentService/Comment/LevelTwo";
+                    String url = serverLocation + "/CommentService/AnswerComment/LevelTwo";
                     Map<String, String> map = new HashMap<>();
                     map.put("commentLevelOneId", String.valueOf(answerIdOrCommentId));
                     map.put("userId", String.valueOf(user.getUserId()));
@@ -500,6 +503,7 @@ public class AnswerActivity extends AbstractCustomActivity {
                         });
                         adapter.notifyDataSetChanged();
                         updateUI(0);
+                        buttonControl(true);
                     } else {
                         Toast.makeText(AnswerActivity.this, simpleDto.getMsg(), Toast.LENGTH_SHORT).show();
                     }
@@ -515,7 +519,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     private void getCommentLevelOne() {
         refreshLayout.setRefreshing(true);
         Long userId = user == null ? -1 : user.getUserId();
-        String url = serverLocation + "/CommentService/Comment/LevelOne/" + getCurrentAnswerId() + "/" + userId + "/" + commentHolder.getLimit();
+        String url = serverLocation + "/CommentService/AnswerComment/LevelOne/" + getCurrentAnswerId() + "/" + userId + "/" + commentHolder.getLimit();
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -597,7 +601,7 @@ public class AnswerActivity extends AbstractCustomActivity {
 
     private void getCommentLevelTwo(Long id, Consumer<List<AnswerCommentLevelTwoVo>> callback) {
         Long userId = user == null ? -1 : user.getUserId();
-        String url = serverLocation + "/CommentService/Comment/LevelTwo/" + id + "/" + userId + "/" + commentLevelTwoLimit;
+        String url = serverLocation + "/CommentService/AnswerComment/LevelTwo/" + id + "/" + userId + "/" + commentLevelTwoLimit;
         RequestUtils.sendSimpleRequest(url, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -758,10 +762,19 @@ public class AnswerActivity extends AbstractCustomActivity {
         toolbar.setTitle(viewBean.getTitle());
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setOnClickListener(v->toQuestionInfoActivity());
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+
+    private void toQuestionInfoActivity() {
+        Intent intent = new Intent(this, QuestionInfoActivity.class);
+        intent.putExtra("questionId",viewBean.getQuestionId());
+        intent.putExtra("title",viewBean.getTitle());
+        startActivityForResult(intent,TO_QUESTION_CODE);
     }
 
 
@@ -781,6 +794,12 @@ public class AnswerActivity extends AbstractCustomActivity {
         return getResources().getDisplayMetrics().heightPixels;
         /*//设置弹窗高度为屏幕高度的3/4
         return peekHeight - (peekHeight / 4);*/
+    }
+
+    private void buttonControl(boolean b) {
+        support.setClickable(b);
+        collect.setClickable(b);
+        comment.setClickable(b);
     }
 
     /*
@@ -809,6 +828,16 @@ public class AnswerActivity extends AbstractCustomActivity {
         inLevelOne = true;
         level1.setVisibility(View.VISIBLE);
         level2.setVisibility(View.GONE);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(resultCode == TO_QUESTION_CODE){
+            onDestroy();
+            init();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
