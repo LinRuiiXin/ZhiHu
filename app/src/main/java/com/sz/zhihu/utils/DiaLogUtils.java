@@ -94,7 +94,7 @@ public class DiaLogUtils {
     public static void showGitHubLocation(Activity activity){
         AlertDialog alertDialog = new AlertDialog.Builder(activity)
                 .setTitle("GitHub地址")
-                .setMessage("客户端：\ngithub.com/LinRuiiXin/ZhiHu \n\n服务端：\ngithub.com/LinRuiiXin/ZhiHuServer\n\n欢迎star!")
+                .setMessage("客户端：\ngithub.com/LinRuiiXin/ZhiHu \n\n服务端：\ngithub.com/LinRuiiXin/ZhiHuMicro\n\n欢迎star!")
                 .setPositiveButton("确定", (d, w) -> {}).create();
         alertDialog.show();
     }

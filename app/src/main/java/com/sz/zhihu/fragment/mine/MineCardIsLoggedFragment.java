@@ -30,7 +30,6 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
     private Activity activity;
     private RoundedImageView portrait;
     private TextView userName;
-    private LinearLayout personalPage;
     private TextView careNum;
     private TextView collectNum;
     private TextView historyNum;
@@ -63,7 +62,6 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
         String serverLocation = activity.getResources().getString(R.string.server_location);
         portrait = view.findViewById(R.id.mine_card_il_portrait);
         userName = view.findViewById(R.id.mine_card_il_username);
-        personalPage = view.findViewById(R.id.mine_card_il_personal_page);
         careNum = view.findViewById(R.id.mine_card_il_care_num);
         collectNum = view.findViewById(R.id.mine_card_il_collect_num);
         historyNum = view.findViewById(R.id.mine_card_il_history_num);
@@ -82,7 +80,7 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
         careNum.setText(String.valueOf(user.getFollowSum()));
         collectNum.setText(String.valueOf(user.getCollectSum()));
         historyNum.setText(String.valueOf(browseRecordCount));
-        personalPage.setOnClickListener(v->{
+        view.setOnClickListener(v->{
             Intent intent = new Intent(activity,HomePageActivity.class);
             activity.startActivity(intent);
         });

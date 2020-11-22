@@ -114,10 +114,6 @@ public class AnswerActivity extends AbstractCustomActivity {
     private ImageView supportTriangle;
 
     public AnswerActivity(){
-        fragments = new ArrayList<>();
-        gson = new Gson();
-        this.user = DBUtils.queryUserHistory();
-        commentHolder = new CommentHolder();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -151,6 +147,10 @@ public class AnswerActivity extends AbstractCustomActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void prepare() {
         bindComponent();
+        fragments = new ArrayList<>();
+        gson = new Gson();
+        this.user = DBUtils.queryUserHistory();
+        commentHolder = new CommentHolder();
         linearLayoutManager = new LinearLayoutManager(AnswerActivity.this);
         viewBean = (RecommendViewBean) getIntent().getSerializableExtra("viewBean");
         serverLocation = getResources().getString(R.string.server_location);
@@ -834,20 +834,25 @@ public class AnswerActivity extends AbstractCustomActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode == TO_QUESTION_CODE){
-            onDestroy();
+            destroyAllDiaLog();
+            getIntent().putExtra("viewBean",data.getSerializableExtra("viewBean"));
             init();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onDestroy() {
+    private void destroyAllDiaLog() {
         dialog.dismiss();
         replyDialog.dismiss();
         optionDialog.dismiss();
         ((ViewGroup) dialogView.getParent()).removeView(dialogView);
         ((ViewGroup) replyView.getParent()).removeView(replyView);
         ((ViewGroup) optionView.getParent()).removeView(optionView);
+    }
+    @Override
+    protected void onDestroy() {
+        destroyAllDiaLog();
         super.onDestroy();
     }
+
 }

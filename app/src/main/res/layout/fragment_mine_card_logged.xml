@@ -5,20 +5,21 @@
     android:layout_height="180dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/mine_card_shape"
+    android:clickable="true"
     android:orientation="vertical">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/mine_card_il_info"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         >
         <com.makeramen.roundedimageview.RoundedImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:id="@+id/mine_card_il_portrait"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="30dp"
             android:src="@drawable/default_portrait"
             app:riv_oval="true"
             android:scaleType="centerCrop"
@@ -29,36 +30,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="50dp"
             android:textColor="#fff"
-            android:textSize="22dp"
+            android:textSize="25dp"
             android:textStyle="bold"
             android:layout_toRightOf="@id/mine_card_il_portrait"
             />
-
-        <LinearLayout
-            android:id="@+id/mine_card_il_personal_page"
-            android:layout_width="wrap_content"
-            android:layout_height="23dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="个人主页"
-                android:textColor="#F6F5F5"
-                android:textSize="12dp" />
-
-            <TextView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/icon_right" />
-        </LinearLayout>
     </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"

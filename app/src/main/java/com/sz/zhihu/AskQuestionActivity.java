@@ -55,6 +55,12 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
     private TextView commit;
     private EditText question;
     private EditText questionDescribe;
+    /*private Button bold;
+    private Button italic;
+    private Button title;
+    private Button order;
+    private Button photo;
+    private Button video;*/
     private final int CODE_IMAGE = 1;
     private final int CODE_VIDEO = 2;
     private String serverLocation;
@@ -77,12 +83,23 @@ public class AskQuestionActivity extends AbstractCustomActivity implements View.
         commit = findViewById(R.id.aq_commit);
         question = findViewById(R.id.aq_question);
         questionDescribe = findViewById(R.id.aq_question_describe);
+        /*bold = findViewById(R.id.aq_button_bold);
+        italic = findViewById(R.id.aq_button_italic);
+        title = findViewById(R.id.aq_button_title);
+        order = findViewById(R.id.aq_button_order);
+        photo = findViewById(R.id.aq_button_photo);
+        video = findViewById(R.id.aq_button_video);*/
         serverLocation = getResources().getString(R.string.server_location);
         user = DBUtils.queryUserHistory();
         gson = new Gson();
         back.setOnClickListener(this);
         choiceType.setOnClickListener(this);
-
+        /*italic.setOnClickListener(this);
+        title.setOnClickListener(this);
+        order.setOnClickListener(this);
+        photo.setOnClickListener(this);
+        video.setOnClickListener(this);
+        commit.setOnClickListener(this);*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

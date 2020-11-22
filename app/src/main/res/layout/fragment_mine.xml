@@ -14,7 +14,7 @@
         android:layout_marginRight="10dp"
         >
         <EditText
-            android:layout_width="280dp"
+            android:layout_width="300dp"
             android:layout_height="35dp"
             android:id="@+id/mine_search"
             android:background="@drawable/search_shape"
@@ -41,6 +41,7 @@
             android:layout_toRightOf="@+id/mine_search"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
+            android:visibility="gone"
             />
         <TextView
             android:layout_width="28dp"
@@ -49,7 +50,7 @@
             android:background="@drawable/icon_setting"
             android:layout_toRightOf="@+id/mine_scan"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="6dp"
+            android:layout_marginLeft="20dp"
             />
     </RelativeLayout>
     <FrameLayout
