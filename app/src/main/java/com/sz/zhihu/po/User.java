@@ -10,6 +10,7 @@ public class User extends DataSupport {
     private Long id;
     //真正用户id
     private Long userId;
+    private boolean isLoadAttentionList;
     private String userName;
     private String password;
     private String mail;
@@ -129,11 +130,20 @@ public class User extends DataSupport {
         this.registerDate = registerDate;
     }
 
+    public boolean isLoadAttentionList() {
+        return isLoadAttentionList;
+    }
+
+    public void setLoadAttentionList(boolean loadAttentionList) {
+        isLoadAttentionList = loadAttentionList;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", userId=" + userId +
+                ", isLoadAttentionList=" + isLoadAttentionList +
                 ", userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", mail='" + mail + '\'' +

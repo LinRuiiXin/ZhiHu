@@ -3,6 +3,7 @@ package com.sz.zhihu.vo;
 import org.litepal.crud.DataSupport;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /*
 * 首页---推荐
@@ -22,6 +23,7 @@ public class RecommendViewBean extends DataSupport implements Serializable {
     private String thumbnail;
     private Long supportSum;//点赞数
     private Long commentSum;//评论数
+    private Date time;
 
     public RecommendViewBean(){}
 
@@ -144,6 +146,14 @@ public class RecommendViewBean extends DataSupport implements Serializable {
         this.commentSum = commentSum;
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
     @Override
     public String toString() {
         return "RecommendViewBean{" +
@@ -160,6 +170,7 @@ public class RecommendViewBean extends DataSupport implements Serializable {
                 ", thumbnail='" + thumbnail + '\'' +
                 ", supportSum=" + supportSum +
                 ", commentSum=" + commentSum +
+                ", time=" + time +
                 '}';
     }
 }

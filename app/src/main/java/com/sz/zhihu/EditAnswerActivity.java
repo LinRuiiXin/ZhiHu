@@ -178,7 +178,7 @@ public class EditAnswerActivity extends AbstractCustomActivity implements View.O
                         File file = FileUtils.getFile(newBitmap);
                         if(file.exists()){
                             if(FileUtils.checkOutFileSize(file,5242880)){
-                                String url = serverLocation + "/Upload/Image/"+user.getUserId();
+                                String url = serverLocation + "/UploadService/Upload/Image/"+user.getUserId();
                                 RequestUtils.sendSingleFile(file, url, "image", new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
@@ -217,7 +217,7 @@ public class EditAnswerActivity extends AbstractCustomActivity implements View.O
                         File file = new File(filePath);
                         if(file.exists()){
                             if(FileUtils.checkOutFileSize(file,20971520)){
-                                String url = serverLocation + "/Upload/Video/" + user.getUserId();
+                                String url = serverLocation + "/UploadService/Upload/Video/" + user.getUserId();
                                 RequestUtils.sendSingleFile(file, url, "video", new Callback() {
                                     @Override
                                     public void onFailure(Call call, IOException e) {
@@ -261,14 +261,14 @@ public class EditAnswerActivity extends AbstractCustomActivity implements View.O
             }
         }
         commit.setEnabled(false);
-        String url = serverLocation + "/Answer";
+        String url = serverLocation + "/AnswerService/Answer";
         Map<String,String> map = new HashMap<>();
         map.put("questionId",String.valueOf(questionBean.getId()));
         map.put("userId",String.valueOf(user.getUserId()));
         map.put("contentType",String.valueOf(contentType));
         String contentFromHtml = HtmlUtils.getContentFromHtml(html);
         int length = contentFromHtml.length();
-        map.put("content",contentFromHtml.substring(0,length <= 52 ? length : 52));
+        map.put("content",contentFromHtml);
         map.put("thumbnail",getResUrl(contentType,html));
         File temporaryText = FileUtils.getTemporaryText(html);
         if(temporaryText.exists()){

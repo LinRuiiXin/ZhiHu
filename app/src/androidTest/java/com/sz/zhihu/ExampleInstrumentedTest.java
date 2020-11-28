@@ -6,10 +6,12 @@ import android.util.Log;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.sz.zhihu.po.UserAttention;
 import com.sz.zhihu.utils.DateProcessor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.litepal.crud.DataSupport;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,9 +30,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() throws ParseException {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        DateProcessor instance = DateProcessor.getInstance();
-        String s = instance.processorDate(dateFormat.parse("2020-7-10 23:59"));
-        Log.i("Test",s);
+        DataSupport.deleteAll(UserAttention.class);
     }
 }

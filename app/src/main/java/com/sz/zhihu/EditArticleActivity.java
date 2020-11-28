@@ -155,9 +155,7 @@ public class EditArticleActivity extends AbstractCustomActivity {
             resource = HtmlUtils.getImgFromHtml(html);
         if(contentType != HtmlUtils.TYPE_ALL_TEXT)
             resource = getResourceFileName(resource);
-        String content = HtmlUtils.getContentFromHtml(html);
-        int len = content.length() > 50 ? 50 : content.length();
-        String contentFromHtml = content.substring(0,len);
+        String contentFromHtml = HtmlUtils.getContentFromHtml(html);
         map.put("contentType",String.valueOf(contentType));
         map.put("thumbnail",resource);
         map.put("content",contentFromHtml);

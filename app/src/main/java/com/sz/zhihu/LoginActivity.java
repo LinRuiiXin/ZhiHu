@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomEditTextListener;
 import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.utils.DiaLogUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
@@ -125,6 +126,7 @@ public class LoginActivity extends AbstractCustomActivity {
                             runOnUiThread(()-> Toast.makeText(LoginActivity.this,"请求失败",Toast.LENGTH_SHORT).show());
                         }
 
+                        @RequiresApi(api = Build.VERSION_CODES.N)
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             SimpleDto simpleDto = gson.fromJson(response.body().string(),SimpleDto.class);
@@ -132,9 +134,11 @@ public class LoginActivity extends AbstractCustomActivity {
                                 if(simpleDto.isSuccess()){
                                     String s = gson.toJson(simpleDto.getObject());
                                     User user = gson.fromJson(s, User.class);
+                                    user.setLoadAttentionList(false);
 //                                    User user = gson.fromJson(simpleDto.getObject().toString(),User.class);
                                     user.setUserId(user.getId());
                                     user.save();
+                                    DBUtils.getUserAttentionListFromServer(LoginActivity.this,user);
                                     Intent intent = new Intent(LoginActivity.this,MainActivity.class);
                                     startActivity(intent);
                                 }else{

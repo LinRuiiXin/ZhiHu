@@ -40,6 +40,7 @@ public class MainActivity extends AbstractCustomActivity {
     private final int STATUS_ADD = 3;
     private final int STATUS_MSG = 4;
     private final int STATUS_MINE = 5;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

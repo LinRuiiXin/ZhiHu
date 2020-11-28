@@ -3,10 +3,13 @@
 <!--    数据库名-->
     <dbname value="litepaldemo" />
 <!--    版本-->
-    <version value="5" />
+    <version value="11" />
     <list>
         <mapping class="com.sz.zhihu.po.User"></mapping>
         <mapping class="com.sz.zhihu.vo.RecommendViewBean"></mapping>
+        <mapping class="com.sz.zhihu.po.UserAttention"></mapping>
+        <mapping class="com.sz.zhihu.po.Information"></mapping>
+        <mapping class="com.sz.zhihu.po.Keyword"></mapping>
     </list>
 
     <!-- 直接设置这个，就表示数据库存储的位置，直接打开手机存储就可以找到 -->

@@ -18,7 +18,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dp"
             />
-            <EditText
+            <TextView
                 android:layout_width="280dp"
                 android:layout_height="35dp"
                 android:id="@+id/index_search"

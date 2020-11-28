@@ -150,7 +150,11 @@ public class QuestionInfoActivity extends AbstractCustomActivity {
                 getAnswerList(listener::finishLoadMore);
             }
         });
-        writeAnswer.setOnClickListener(v -> {});
+        writeAnswer.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditAnswerActivity.class);
+            intent.putExtra("question",new Question(questionId,title,0l,0,0l,0l,0l));
+            startActivity(intent);
+        });
         attentionQuestion.setOnClickListener(v -> {
             attentionQuestion.setClickable(false);
             if(DBUtils.checkIsLogged(this)){

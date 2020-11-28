@@ -10,22 +10,16 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.bottomnavigation.BottomNavigationMenu;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
-import com.sz.zhihu.compoent.SettingItemButton;
 import com.sz.zhihu.databinding.ActivityAccountSettingsBinding;
 import com.sz.zhihu.dto.SimpleDto;
-import com.sz.zhihu.listener.settings.Account;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.utils.RequestUtils;
@@ -152,7 +146,6 @@ public class AccountSettingsActivity extends AbstractCustomActivity{
         DBUtils.clearUserHistory();
         Intent intent = new Intent(AccountSettingsActivity.this, LoginActivity.class);
         startActivity(intent);
-        AccountSettingsActivity.this.finish();
     }
 
 
