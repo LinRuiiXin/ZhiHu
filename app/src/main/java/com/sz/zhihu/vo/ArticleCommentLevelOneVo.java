@@ -9,6 +9,15 @@ public class ArticleCommentLevelOneVo {
     private User user;
     private ArticleCommentLevelOne articleCommentLevelOne;
 
+    public ArticleCommentLevelOneVo() {
+    }
+
+    public ArticleCommentLevelOneVo(boolean support, User user, ArticleCommentLevelOne articleCommentLevelOne) {
+        this.support = support;
+        this.user = user;
+        this.articleCommentLevelOne = articleCommentLevelOne;
+    }
+
     public boolean isSupport() {
         return support;
     }

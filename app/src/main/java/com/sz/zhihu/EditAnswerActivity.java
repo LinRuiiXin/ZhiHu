@@ -267,7 +267,7 @@ public class EditAnswerActivity extends AbstractCustomActivity implements View.O
         map.put("userId",String.valueOf(user.getUserId()));
         map.put("contentType",String.valueOf(contentType));
         String contentFromHtml = HtmlUtils.getContentFromHtml(html);
-        int length = contentFromHtml.length();
+        contentFromHtml = contentFromHtml.length() > 50 ? contentFromHtml.substring(0,50) : contentFromHtml;
         map.put("content",contentFromHtml);
         map.put("thumbnail",getResUrl(contentType,html));
         File temporaryText = FileUtils.getTemporaryText(html);

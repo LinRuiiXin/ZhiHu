@@ -17,6 +17,7 @@ import com.sz.zhihu.interfaces.CustomEditTextListener;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.utils.DiaLogUtils;
+import com.sz.zhihu.utils.GsonUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
@@ -59,7 +60,7 @@ public class LoginActivity extends AbstractCustomActivity {
         findPassword = findViewById(R.id.login_mp_find_password);
         register = findViewById(R.id.login_mp_register);
         serverLocation = getResources().getString(R.string.server_location);
-        gson = new Gson();
+        gson = GsonUtils.getGson();
         addListener();
     }
 

@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.sz.zhihu.R;
+import com.sz.zhihu.SearchActivity;
 import com.sz.zhihu.SettingsActivity;
 import com.sz.zhihu.fragment.mine.MineCardIsLoggedFragment;
 import com.sz.zhihu.fragment.mine.MineCardNotLoggedFragment;
@@ -26,6 +27,7 @@ public class MineFragment extends Fragment implements CustomFragmentFunction {
     private View view;
     private TextView settings;
     private Activity activity;
+    private TextView search;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -46,6 +48,8 @@ public class MineFragment extends Fragment implements CustomFragmentFunction {
                 getChildFragmentManager().beginTransaction().replace(R.id.mine_card,getNotLogFragment()).commit();
             }
             settings = view.findViewById(R.id.mine_setting);
+            search = view.findViewById(R.id.mine_search);
+
             setListener();
         }
         return view;
@@ -54,6 +58,10 @@ public class MineFragment extends Fragment implements CustomFragmentFunction {
     private void setListener() {
         settings.setOnClickListener(v -> {
             Intent intent = new Intent(activity, SettingsActivity.class);
+            activity.startActivity(intent);
+        });
+        search.setOnClickListener(v -> {
+            Intent intent = new Intent(activity, SearchActivity.class);
             activity.startActivity(intent);
         });
     }

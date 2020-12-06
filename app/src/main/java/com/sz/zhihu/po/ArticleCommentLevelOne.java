@@ -4,12 +4,25 @@ import java.util.Date;
 public class ArticleCommentLevelOne {
 
     private Long id;
-    private Long answerId;
+    private Long articleId;
     private Long userId;
     private String content;
     private Date time;
     private Long supportSum;
     private int hasReply;
+
+    public ArticleCommentLevelOne() {
+    }
+
+    public ArticleCommentLevelOne(Long id, Long articleId, Long userId, String content, Date time, Long supportSum, int hasReply) {
+        this.id = id;
+        this.articleId = articleId;
+        this.userId = userId;
+        this.content = content;
+        this.time = time;
+        this.supportSum = supportSum;
+        this.hasReply = hasReply;
+    }
 
     public Long getId() {
         return id;
@@ -19,12 +32,12 @@ public class ArticleCommentLevelOne {
         this.id = id;
     }
 
-    public Long getAnswerId() {
-        return answerId;
+    public Long getArticleId() {
+        return articleId;
     }
 
-    public void setAnswerId(Long answerId) {
-        this.answerId = answerId;
+    public void setArticleId(Long articleId) {
+        this.articleId = articleId;
     }
 
     public Long getUserId() {
@@ -67,10 +80,29 @@ public class ArticleCommentLevelOne {
         this.hasReply = hasReply;
     }
 
+    @Override
+    public String toString() {
+        return "ArticleCommentLevelOne{" +
+                "id=" + id +
+                ", articleId=" + articleId +
+                ", userId=" + userId +
+                ", content='" + content + '\'' +
+                ", time=" + time +
+                ", supportSum=" + supportSum +
+                ", hasReply=" + hasReply +
+                '}';
+    }
+
     public void incrementSupportSum(){
         supportSum++;
     }
     public void decrementSupportSum(){
         supportSum--;
+    }
+    public void incrementReply(){
+        hasReply++;
+    }
+    public void decrementReply(){
+        hasReply--;
     }
 }

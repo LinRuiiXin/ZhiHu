@@ -2,10 +2,11 @@ package com.sz.zhihu.po;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-public class User extends DataSupport {
+public class User extends DataSupport implements Serializable {
     //SQLite默认主键
     private Long id;
     //真正用户id
@@ -136,6 +137,10 @@ public class User extends DataSupport {
 
     public void setLoadAttentionList(boolean loadAttentionList) {
         isLoadAttentionList = loadAttentionList;
+    }
+
+    public User clone(){
+        return new User(getUserId(),0l,userName,password,mail,phone,profile,portraitFileName,registerDate);
     }
 
     @Override

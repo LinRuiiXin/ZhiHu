@@ -79,7 +79,7 @@ public class SearchActivity extends AbstractCustomActivity {
     private void prepare() {
         gson = GsonUtils.getGson();
         serverLocation = getString(R.string.server_location);
-        historyData = DBUtils.getHistory();
+        historyData = DBUtils.getSearchHistory();
         searchResultData = new ArrayList<>();
         searchHistoryAdapter = new SearchHistoryAdapter(this, historyData,this::onKeywordSelect);
         searchKeywordResultAdapter = new SearchKeywordResultAdapter(this, searchResultData, this::onKeywordSelect);

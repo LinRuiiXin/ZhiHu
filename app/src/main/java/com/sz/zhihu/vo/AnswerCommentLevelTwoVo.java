@@ -9,6 +9,16 @@ public class AnswerCommentLevelTwoVo {
     private User userReplyTo;
     private User replyUser;
 
+    public AnswerCommentLevelTwoVo() {
+    }
+
+    public AnswerCommentLevelTwoVo(boolean isSupport, AnswerCommentLevelTwo answerCommentLevelTwo, User userReplyTo, User replyUser) {
+        this.isSupport = isSupport;
+        this.answerCommentLevelTwo = answerCommentLevelTwo;
+        this.userReplyTo = userReplyTo;
+        this.replyUser = replyUser;
+    }
+
     public boolean isSupport() {
         return isSupport;
     }

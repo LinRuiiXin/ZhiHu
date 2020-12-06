@@ -18,7 +18,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 //请求工具类
 public class RequestUtils {
-    private static Gson gson = new Gson();
+    private static Gson gson = GsonUtils.getGson();
     private static OkHttpClient httpClient = new OkHttpClient();
     /**
      * 传入服务器接口，回调接口实现(Get提交)

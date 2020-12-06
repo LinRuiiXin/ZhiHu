@@ -11,6 +11,19 @@ public class AnswerCommentLevelTwo {
     private Date time;
     private Long supportSum;
 
+    public AnswerCommentLevelTwo() {
+    }
+
+    public AnswerCommentLevelTwo(Long id, Long levelOneId, Long replyToUserId, Long replyUserId, String content, Date time, Long supportSum) {
+        this.id = id;
+        this.levelOneId = levelOneId;
+        this.replyToUserId = replyToUserId;
+        this.replyUserId = replyUserId;
+        this.content = content;
+        this.time = time;
+        this.supportSum = supportSum;
+    }
+
     public Long getId() {
         return id;
     }

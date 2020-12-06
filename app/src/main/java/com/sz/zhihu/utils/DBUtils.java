@@ -53,11 +53,6 @@ public class DBUtils {
         DataSupport.delete(Keyword.class,keyword.getId());
     }
 
-    public static List<Keyword> getHistory(){
-        List<Keyword> keywords = DataSupport.offset(0).limit(10).order("id desc").find(Keyword.class);
-        return keywords;
-    }
-
     public static void clearUserHistory() {
         DataSupport.deleteAll(Information.class);
         DataSupport.deleteAll(User.class);
@@ -128,10 +123,12 @@ public class DBUtils {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public static void getUserAttentionList(Activity activity,User user, Consumer<List<UserAttention>> consumer) {
-        if (user.isLoadAttentionList()) {
-            consumer.accept(getUserAttentionList(user.getUserId()));
-        } else {
-            getUserAttentionListFromServer(activity,user,consumer);
+        if(user != null){
+            if (user.isLoadAttentionList()) {
+                consumer.accept(getUserAttentionList(user.getUserId()));
+            } else {
+                getUserAttentionListFromServer(activity,user,consumer);
+            }
         }
     }
 
@@ -154,16 +151,27 @@ public class DBUtils {
         return recommendViewBeans;
     }
 
+
+    public static List<Keyword> getSearchHistory(){
+        List<Keyword> keywords = DataSupport.offset(0).limit(10).order("id desc").find(Keyword.class);
+//        List<Keyword> keywords = DataSupport.findAll(Keyword.class);
+        return keywords;
+    }
+
     public static void saveIfNotExistKeyword(Keyword keyword){
-        Keyword first = DataSupport.where("title=?", keyword.getTitle()).findFirst(Keyword.class);
+        Keyword first = DataSupport.where("title = ?", keyword.getTitle()).findFirst(Keyword.class);
         if(first != null){
             first.delete();
         }
-        keyword.setId(0);
-        keyword.save();
+        Keyword newKeyword = new Keyword(keyword.getTitle());
+        newKeyword.save();
     }
 
     public static void clearSearchHistory(){
         DataSupport.deleteAll(Keyword.class,"");
+    }
+
+    public static void updateUser(User user) {
+        user.saveOrUpdate("userId = ?",String.valueOf(user.getUserId()));
     }
 }

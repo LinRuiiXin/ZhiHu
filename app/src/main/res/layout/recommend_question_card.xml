@@ -3,82 +3,90 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="410dp"
-    android:background="@drawable/recommend_question_card_shape">
-
-    <TextView
-        android:id="@+id/rqc_subscribeSum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:textColor="#C5C5C5"
-        android:textSize="12dp"
-        android:layout_margin="20dp"
-        />
-
-    <TextView
-        android:id="@+id/rqc_lin2"
-        android:layout_width="30dp"
-        android:layout_height="20dp"
-        android:layout_below="@+id/rqc_subscribeSum"
-        android:layout_alignLeft="@+id/rqc_subscribeSum"
-        android:layout_marginTop="60dp"
-        android:background="@drawable/icon_quotes" />
-
-    <TextView
-        android:id="@+id/rqc_question"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rqc_lin2"
-        android:layout_alignLeft="@id/rqc_lin2"
-        android:layout_marginTop="10dp"
-        android:textColor="#000"
-        android:textSize="20dp"
-        android:layout_marginRight="20dp"/>
-
-    <TextView
-        android:id="@+id/rqc_answer_sum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rqc_question"
-        android:layout_marginTop="15dp"
-        android:layout_alignLeft="@id/rqc_question"
-        android:textColor="#d6d6d6"
-        android:textSize="10dp" />
+    android:background="@drawable/recommend_question_card_shape"
+    android:clickable="true"
+    >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:id="@+id/rqc_card_wrapper"
         >
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:layout_width="23dp"
-            android:layout_height="23dp"
-            android:id="@+id/rqc_portrait"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            app:riv_oval="true"
-            android:src="@drawable/default_portrait"
-            android:scaleType="centerCrop"
-            />
         <TextView
+            android:id="@+id/rqc_subscribeSum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/rqc_username"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/rqc_portrait"
             android:layout_marginLeft="10dp"
+            android:textColor="#C5C5C5"
             android:textSize="12dp"
+            android:layout_margin="20dp"
             />
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:id="@+id/rqc_care"
-            android:background="@drawable/rqc_button_enable_shape"
-            android:text="+ 关注问题"
-            android:textSize="10dp"
-            android:textColor="@color/ZhiHuBlue"
-            android:layout_alignParentRight="true"
 
-            />
+        <TextView
+            android:id="@+id/rqc_lin2"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:layout_below="@+id/rqc_subscribeSum"
+            android:layout_alignLeft="@+id/rqc_subscribeSum"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/icon_quotes" />
+
+        <TextView
+            android:id="@+id/rqc_question"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rqc_lin2"
+            android:layout_alignLeft="@id/rqc_lin2"
+            android:layout_marginTop="10dp"
+            android:textColor="#000"
+            android:textSize="20dp"
+            android:layout_marginRight="20dp"/>
+
+        <TextView
+            android:id="@+id/rqc_answer_sum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rqc_question"
+            android:layout_marginTop="15dp"
+            android:layout_alignLeft="@id/rqc_question"
+            android:textColor="#d6d6d6"
+            android:textSize="10dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            >
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:id="@+id/rqc_portrait"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                app:riv_oval="true"
+                android:src="@drawable/default_portrait"
+                android:scaleType="centerCrop"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rqc_username"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/rqc_portrait"
+                android:layout_marginLeft="10dp"
+                android:textSize="12dp"
+                />
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:id="@+id/rqc_care"
+                android:background="@drawable/rqc_button_enable_shape"
+                android:text="+ 关注问题"
+                android:textSize="10dp"
+                android:textColor="@color/ZhiHuBlue"
+                android:layout_alignParentRight="true"
+
+                />
+        </RelativeLayout>
     </RelativeLayout>
+
 </RelativeLayout>

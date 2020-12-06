@@ -82,6 +82,7 @@ public class MineCardIsLoggedFragment extends Fragment implements CustomFragment
         historyNum.setText(String.valueOf(browseRecordCount));
         view.setOnClickListener(v->{
             Intent intent = new Intent(activity,HomePageActivity.class);
+            intent.putExtra("userId",user.getUserId());
             activity.startActivity(intent);
         });
         care.setOnClickListener(v->{});

@@ -70,4 +70,5 @@ dependencies {
 //    极光推送
     compile 'cn.jiguang.sdk:jpush:3.8.6'  // 此处以JPush 3.8.6 版本为例。
     compile 'cn.jiguang.sdk:jcore:2.5.5'  // 此处以JCore 2.5.5 版本为例。
+    implementation 'com.github.BakerJQ:Android-InfiniteCards:1.0.5'
 }

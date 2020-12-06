@@ -8,6 +8,15 @@ public class AnswerCommentLevelOneVo {
     private User user;
     private AnswerCommentLevelOne commentLevelOne;
 
+    public AnswerCommentLevelOneVo() {
+    }
+
+    public AnswerCommentLevelOneVo(boolean support, User user, AnswerCommentLevelOne commentLevelOne) {
+        this.support = support;
+        this.user = user;
+        this.commentLevelOne = commentLevelOne;
+    }
+
     public boolean isSupport() {
         return support;
     }

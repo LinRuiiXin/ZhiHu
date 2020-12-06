@@ -42,6 +42,7 @@ import com.sz.zhihu.po.AnswerCommentLevelOne;
 import com.sz.zhihu.po.AnswerCommentLevelTwo;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DiaLogUtils;
+import com.sz.zhihu.utils.GsonUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
@@ -56,6 +57,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 import static com.sz.zhihu.R.id.answer_tool_bar;
+import static com.sz.zhihu.R.id.content;
 
 public class AnswerActivity extends AbstractCustomActivity {
     public static final int TO_QUESTION_CODE = 3;
@@ -148,7 +151,7 @@ public class AnswerActivity extends AbstractCustomActivity {
     private void prepare() {
         bindComponent();
         fragments = new ArrayList<>();
-        gson = new Gson();
+        gson = GsonUtils.getGson();
         this.user = DBUtils.queryUserHistory();
         commentHolder = new CommentHolder();
         linearLayoutManager = new LinearLayoutManager(AnswerActivity.this);
@@ -335,13 +338,41 @@ public class AnswerActivity extends AbstractCustomActivity {
         if (b) {
             optionDelete.setBackground(getDrawable(R.drawable.shape_radius_right_delete));
             optionDelete.setOnClickListener(v -> {
-
+                deleteCommentLevelTwo(answerCommentLevelTwoVo);
             });
         } else {
             optionDelete.setVisibility(View.GONE);
             optionReply.setBackground(getDrawable(R.drawable.shape_radius_right_reply));
         }
         optionDialog.show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void deleteCommentLevelTwo(AnswerCommentLevelTwoVo answerCommentLevelTwoVo) {
+        String url = serverLocation + "/CommentService/AnswerComment/LevelTwo";
+        Map<String,String> param = new HashMap<>(1);
+        param.put("replyId",String.valueOf(answerCommentLevelTwoVo.getAnswerCommentLevelTwo().getId()));
+        RequestUtils.deleteWithParams(url, param, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(()->{
+                    Toast.makeText(AnswerActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = GsonUtils.parseJsonToSimpleDto(response.body().string());
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        commentLevelTwoVos.remove(answerCommentLevelTwoVo);
+                        answerCommentLevelTwoAdapter.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(AnswerActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     //初始化"回复"对话框
@@ -405,6 +436,10 @@ public class AnswerActivity extends AbstractCustomActivity {
                         SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
                         runOnUiThread(() -> {
                             if (simpleDto.isSuccess()) {
+                                Long newLevelOneId = gson.fromJson(gson.toJson(simpleDto.getObject()), Long.class);
+                                AnswerCommentLevelOneVo oneVo = convertNewCommentToLv1Vo(newLevelOneId,replyEditText.getText().toString());
+                                answerCommentLevelOneVos.add(oneVo);
+                                commentLevel1Adapter.notifyDataSetChanged();
                                 Toast.makeText(AnswerActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(AnswerActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
@@ -438,6 +473,14 @@ public class AnswerActivity extends AbstractCustomActivity {
                         public void onResponse(Call call, Response response) throws IOException {
                             SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
                             runOnUiThread(() -> {
+                                Long newLevelTwoId = gson.fromJson(gson.toJson(simpleDto.getObject()), Long.class);
+                                answerCommentLevelOneVos.forEach(vo->{if(vo.getCommentLevelOne().getId() == answerIdOrCommentId) vo.getCommentLevelOne().incrementReply(); });
+                                commentLevel1Adapter.notifyDataSetChanged();
+                                if(!inLevelOne){
+                                    AnswerCommentLevelTwoVo levelTwoVo = convertNewCommentToLv2Vo(newLevelTwoId,answerIdOrCommentId,replyObject,content);
+                                    commentLevelTwoVos.add(levelTwoVo);
+                                    answerCommentLevelTwoAdapter.notifyDataSetChanged();
+                                }
                                 Toast.makeText(AnswerActivity.this, simpleDto.getMsg(), Toast.LENGTH_SHORT).show();
                                 replyEditText.setText("");
                                 replyDialog.dismiss();
@@ -460,6 +503,7 @@ public class AnswerActivity extends AbstractCustomActivity {
 
             @Override
             public void onPageSelected(int position) {
+                clearComment();
                 if (position == (fragments.size() - 1)) {
                     getNextAnswer();
                 }
@@ -570,8 +614,12 @@ public class AnswerActivity extends AbstractCustomActivity {
         commentHolder.clear();
         level1.setVisibility(View.GONE);
         level2.setVisibility(View.GONE);
-        answerCommentLevelOneVos.clear();
-        commentLevelTwoVos.clear();
+        if(answerCommentLevelOneVos != null){
+            answerCommentLevelOneVos.clear();
+        }
+        if(commentLevelTwoVos != null){
+            commentLevelTwoVos.clear();
+        }
         inLevelOne = true;
         clearCommentLevelTwoData();
     }
@@ -581,6 +629,8 @@ public class AnswerActivity extends AbstractCustomActivity {
      * 由一级评论点击"查看回复"回调此方法，并传递一级评论id
      * */
     private void toCommentLevel2(Long id) {
+        commentLevelTwoVos.clear();
+        commentLevelTwoLimit=0;
         showLevelTwo();
         level2.setAdapter(answerCommentLevelTwoAdapter);
         level2.setLayoutManager(new LinearLayoutManager(this));
@@ -777,6 +827,25 @@ public class AnswerActivity extends AbstractCustomActivity {
         startActivityForResult(intent,TO_QUESTION_CODE);
     }
 
+    /*
+    * 添加一级评论后服务器会返回此评论的Id，将这个Id包装为新的评论VO
+    * @newLevelOneId 新的评论Id
+    * @return 新的评论Vo 默认点赞为false
+    * */
+    private AnswerCommentLevelOneVo convertNewCommentToLv1Vo(Long newLevelOneId,String content) {
+        AnswerCommentLevelOne levelOne = new AnswerCommentLevelOne(newLevelOneId, getCurrentAnswerId(), user.getUserId(), content, new Date(), 0l, 0);
+        return new AnswerCommentLevelOneVo(false,user.clone(),levelOne);
+    }
+
+    /*
+     * 添加二级评论后服务器会返回此评论的Id，将这个Id包装为新的评论VO
+     * @newLevelOneId 新的评论Id
+     * @return 新的评论Vo 默认点赞为false
+    * */
+    private AnswerCommentLevelTwoVo convertNewCommentToLv2Vo(Long newLevelTwoId,Long levelOneId,User targetUser, String content) {
+        AnswerCommentLevelTwo levelTwo = new AnswerCommentLevelTwo(newLevelTwoId, levelOneId, targetUser.getId(), user.getUserId(), content, new Date(), 0l);
+        return new AnswerCommentLevelTwoVo(false,levelTwo,targetUser,user.clone());
+    }
 
     private Long getCurrentAnswerId() {
         int currentItem = viewPager.getCurrentItem();

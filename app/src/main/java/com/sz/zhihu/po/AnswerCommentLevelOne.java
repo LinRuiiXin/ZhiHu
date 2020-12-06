@@ -11,6 +11,16 @@ public class AnswerCommentLevelOne {
     private Long supportSum;
     private int hasReply;
 
+    public AnswerCommentLevelOne(Long id, Long answerId, Long userId, String content, Date time, Long supportSum, int hasReply) {
+        this.id = id;
+        this.answerId = answerId;
+        this.userId = userId;
+        this.content = content;
+        this.time = time;
+        this.supportSum = supportSum;
+        this.hasReply = hasReply;
+    }
+
     public Long getId() {
         return id;
     }
@@ -73,7 +83,8 @@ public class AnswerCommentLevelOne {
     public void decrementSupportSum(){
         supportSum--;
     }
-
+    public void incrementReply(){hasReply++;}
+    public void decrementReply(){hasReply--;}
     @Override
     public String toString() {
         return "AnswerCommentLevelOne{" +

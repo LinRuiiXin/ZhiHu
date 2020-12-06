@@ -33,9 +33,12 @@ import com.sz.zhihu.adapter.ArticleCommentLevelTwoAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.holder.CommentHolder;
 import com.sz.zhihu.po.AnswerCommentLevelOne;
+import com.sz.zhihu.po.ArticleCommentLevelOne;
+import com.sz.zhihu.po.ArticleCommentLevelTwo;
 import com.sz.zhihu.po.User;
 import com.sz.zhihu.utils.DBUtils;
 import com.sz.zhihu.utils.DiaLogUtils;
+import com.sz.zhihu.utils.GsonUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.StringUtils;
 import com.sz.zhihu.utils.SystemUtils;
@@ -49,6 +52,7 @@ import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +151,7 @@ public class ArticleActivity extends AbstractCustomActivity {
         }
         articleId = recommendViewBean.getContentId();
         author = new User(recommendViewBean.getUserId(),0l,recommendViewBean.getUsername(),null,null,null,recommendViewBean.getIntroduction(),recommendViewBean.getPortraitFileName(),null);
-        gson = new Gson();
+        gson = GsonUtils.getGson();
         user = DBUtils.queryUserHistory();
         serverLocation = getString(R.string.server_location);
         commentHolder = new CommentHolder();
@@ -266,13 +270,39 @@ public class ArticleActivity extends AbstractCustomActivity {
         if (b) {
             optionDelete.setBackground(getDrawable(R.drawable.shape_radius_right_delete));
             optionDelete.setOnClickListener(v -> {
-
+                deleteCommentLevelTwo(articleCommentLevelTwoVo);
             });
         } else {
             optionDelete.setVisibility(View.GONE);
             optionReply.setBackground(getDrawable(R.drawable.shape_radius_right_reply));
         }
         optionDialog.show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void deleteCommentLevelTwo(ArticleCommentLevelTwoVo articleCommentLevelTwoVo) {
+        String url = serverLocation + "/CommentService/ArticleComment/LevelTwo";
+        Map<String,String> params = new HashMap<>(1);
+        params.put("replyId",String.valueOf(articleCommentLevelTwoVo.getAnswerCommentLevelTwo().getId()));
+        RequestUtils.deleteWithParams(url, params, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(()->{Toast.makeText(ArticleActivity.this,"请求失败",Toast.LENGTH_SHORT).show(); });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                SimpleDto simpleDto = GsonUtils.parseJsonToSimpleDto(response.body().string());
+                runOnUiThread(()->{
+                    if(simpleDto.isSuccess()){
+                        commentLevelTwoVos.remove(articleCommentLevelTwoVo);
+                        articleCommentLevelTwoAdapter.notifyDataSetChanged();
+                    }else{
+                        Toast.makeText(ArticleActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     /*
@@ -353,6 +383,9 @@ public class ArticleActivity extends AbstractCustomActivity {
      * 由一级评论点击"查看回复"回调此方法，并传递一级评论id
      * */
     private void toCommentLevel2(Long id) {
+        commentLevelTwoVos.clear();
+        articleCommentLevelTwoAdapter.notifyDataSetChanged();
+        commentLevelTwoLimit = 0;
         showLevelTwo();
         level2.setAdapter(articleCommentLevelTwoAdapter);
         level2.setLayoutManager(new LinearLayoutManager(this));
@@ -557,6 +590,10 @@ public class ArticleActivity extends AbstractCustomActivity {
                         SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
                         runOnUiThread(() -> {
                             if (simpleDto.isSuccess()) {
+                                Long newLevelOneId = gson.fromJson(gson.toJson(simpleDto.getObject()), Long.class);
+                                ArticleCommentLevelOneVo vo = convertLv1IdToVo(newLevelOneId,replyEditText.getText().toString());
+                                articleCommentLevelOneVos.add(vo);
+                                commentLevel1Adapter.notifyDataSetChanged();
                                 Toast.makeText(ArticleActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(ArticleActivity.this, "服务器繁忙", Toast.LENGTH_SHORT).show();
@@ -590,7 +627,19 @@ public class ArticleActivity extends AbstractCustomActivity {
                         public void onResponse(Call call, Response response) throws IOException {
                             SimpleDto simpleDto = gson.fromJson(response.body().string(), SimpleDto.class);
                             runOnUiThread(() -> {
-                                Toast.makeText(ArticleActivity.this, simpleDto.getMsg(), Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(ArticleActivity.this, simpleDto.getMsg(), Toast.LENGTH_SHORT).show();
+                                Long newCommentId = gson.fromJson(gson.toJson(simpleDto.getObject()), Long.class);
+                                articleCommentLevelOneVos.forEach(vo->{
+                                    if(vo.getArticleCommentLevelOne().getId()==answerIdOrCommentId)
+                                        vo.getArticleCommentLevelOne().incrementReply();
+                                });
+                                commentLevel1Adapter.notifyDataSetChanged();
+                                if(!inLevelOne){
+                                    ArticleCommentLevelTwoVo vo = new ArticleCommentLevelTwoVo(false, new ArticleCommentLevelTwo(newCommentId, answerIdOrCommentId, replyObject.getId(), user.getUserId(), content, new Date(), 0l), replyObject, user.clone());
+                                    commentLevelTwoVos.add(vo);
+                                    articleCommentLevelTwoAdapter.notifyDataSetChanged();
+                                }
+
                                 replyEditText.setText("");
                                 replyDialog.dismiss();
                             });
@@ -602,7 +651,12 @@ public class ArticleActivity extends AbstractCustomActivity {
         }
     }
 
-        //初始化"回复"对话框
+    private ArticleCommentLevelOneVo convertLv1IdToVo(Long newLevelOneId, String content) {
+        ArticleCommentLevelOne levelOne = new ArticleCommentLevelOne(newLevelOneId, articleId, user.getUserId(), content, new Date(), 0l, 0);
+        return new ArticleCommentLevelOneVo(false,user.clone(),levelOne);
+    }
+
+    //初始化"回复"对话框
     private void initReplyDialog() {
         replyView = View.inflate(this, R.layout.answer_comment_reply_dialog, null);
         replyDialog = new BottomSheetDialog(this);
@@ -695,67 +749,70 @@ public class ArticleActivity extends AbstractCustomActivity {
         ((ViewGroup) optionView.getParent()).removeView(optionView);
         super.onDestroy();
     }
-}
 
-class ArticleToken{
-    private boolean isSupport;
-    private boolean isAttention;
-    private Long supportSum;
 
-    public ArticleToken() {}
 
-    public ArticleToken(boolean isSupport,boolean isAttention, Long supportSum) {
-        this.isSupport = isSupport;
-        this.isAttention = isAttention;
-        this.supportSum = supportSum;
+    class ArticleToken{
+        private boolean isSupport;
+        private boolean isAttention;
+        private Long supportSum;
+
+        public ArticleToken() {}
+
+        public ArticleToken(boolean isSupport,boolean isAttention, Long supportSum) {
+            this.isSupport = isSupport;
+            this.isAttention = isAttention;
+            this.supportSum = supportSum;
+        }
+
+        public void support(){
+            this.isSupport = true;
+            this.supportSum++;
+        }
+
+        public void unSupport(){
+            this.isSupport = false;
+            this.supportSum--;
+        }
+
+        public void reverseSupport(){
+            if(isSupport)
+                unSupport();
+            else
+                support();
+        }
+
+        public void attention(){
+            this.isAttention = true;
+        }
+
+        public void cancelAttention(){
+            this.isAttention = false;
+        }
+
+        public boolean isSupport() {
+            return isSupport;
+        }
+
+        public void setSupport(boolean support) {
+            isSupport = support;
+        }
+
+        public boolean isAttention() {
+            return isAttention;
+        }
+
+        public void setAttention(boolean attention) {
+            isAttention = attention;
+        }
+
+        public Long getSupportSum() {
+            return supportSum;
+        }
+
+        public void setSupportSum(Long supportSum) {
+            this.supportSum = supportSum;
+        }
     }
 
-    public void support(){
-        this.isSupport = true;
-        this.supportSum++;
-    }
-
-    public void unSupport(){
-        this.isSupport = false;
-        this.supportSum--;
-    }
-
-    public void reverseSupport(){
-        if(isSupport)
-            unSupport();
-        else
-            support();
-    }
-
-    public void attention(){
-        this.isAttention = true;
-    }
-
-    public void cancelAttention(){
-        this.isAttention = false;
-    }
-
-    public boolean isSupport() {
-        return isSupport;
-    }
-
-    public void setSupport(boolean support) {
-        isSupport = support;
-    }
-
-    public boolean isAttention() {
-        return isAttention;
-    }
-
-    public void setAttention(boolean attention) {
-        isAttention = attention;
-    }
-
-    public Long getSupportSum() {
-        return supportSum;
-    }
-
-    public void setSupportSum(Long supportSum) {
-        this.supportSum = supportSum;
-    }
 }

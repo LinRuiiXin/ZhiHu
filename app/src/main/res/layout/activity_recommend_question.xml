@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:infiniteCard="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     tools:context=".RecommendQuestionActivity">
 
@@ -14,26 +15,59 @@
         android:layout_marginTop="30dp"
         android:background="@drawable/icon_close_activity" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.bakerj.infinitecards.InfiniteCardView
         android:id="@+id/arq_card"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true"
+        infiniteCard:animDuration="700"
+        infiniteCard:cardRatio="1.3"
+        android:clickable="false"
+        />
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="570dp"
-        android:layout_below="@+id/arq_close"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/arq_card"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="30dp"/>
-
-    <Button
-        android:id="@+id/arq_write_answer"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/arq_add_answer_button_shape"
-        android:text="写回答"
-        style="?android:attr/borderlessButtonStyle"
-        android:textColor="@color/ZhiHuBlue" />
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        >
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/arq_refresh"
+            android:background="@drawable/circle_button_light"
+            android:text="刷新"
+            android:gravity="center"
+            android:textColor="@color/ZhiHuBlue"
+            android:clickable="true"
+            android:textSize="12sp"
+            />
+        <!--<TextView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:id="@+id/arq_write_answer"
+            android:layout_marginLeft="30dp"
+            android:background="@drawable/circle_button_dark"
+            android:text="写回答"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:clickable="true"
+            android:textSize="12sp"
+            />-->
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:id="@+id/arq_next"
+            android:layout_marginLeft="50dp"
+            android:background="@drawable/circle_button_dark"
+            android:text="下个"
+            android:gravity="center"
+            android:textColor="#fff"
+            android:clickable="true"
+            android:textSize="12sp"
+            android:elevation="2dp"
+            />
+    </LinearLayout>
 </RelativeLayout>

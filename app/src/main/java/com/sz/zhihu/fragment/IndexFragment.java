@@ -72,19 +72,19 @@ public class IndexFragment extends Fragment implements CustomFragmentFunction {
                     return "Title"+(position+1);
                 }
 
-                @NonNull
-                @Override
-                public Fragment getItem(int position) {
-                    switch (position) {
-                        case 0:
-                            return careFragment;
-                        case 1:
-                            return recommendFragment;
-                        case 2:
-                            return hotFragment;
+                    @NonNull
+                    @Override
+                    public Fragment getItem(int position) {
+                        switch (position) {
+                            case 0:
+                                return careFragment;
+                            case 1:
+                                return recommendFragment;
+                            case 2:
+                                return hotFragment;
+                        }
+                        return null;
                     }
-                    return null;
-                }
 
                 @Override
                 public int getCount() {

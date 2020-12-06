@@ -11,6 +11,11 @@ public class Question implements Serializable {
     private Long browseSum;
     private Long answerSum;
     public Question(){}
+
+    public Question(Long questionerId) {
+        this.questionerId = questionerId;
+    }
+
     public Question(Long id, String name, Long questionerId, int hasDescribe, Long subscribeSum, Long browseSum, Long answerSum) {
         this.id = id;
         this.name = name;

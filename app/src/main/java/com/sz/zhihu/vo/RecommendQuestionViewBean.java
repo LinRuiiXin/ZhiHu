@@ -8,6 +8,13 @@ public class RecommendQuestionViewBean {
     private Question question;
     private User user;
 
+    public RecommendQuestionViewBean() {
+    }
+
+    public RecommendQuestionViewBean(Question question) {
+        this.question = question;
+    }
+
     public Question getQuestion() {
         return question;
     }
@@ -30,6 +37,10 @@ public class RecommendQuestionViewBean {
 
     public void setSubscribe(boolean subscribe) {
         this.subscribe = subscribe;
+    }
+
+    public static RecommendQuestionViewBean getLoadingViewBean(){
+        return new RecommendQuestionViewBean(new Question(-1l));
     }
 
     @Override

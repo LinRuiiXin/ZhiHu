@@ -2,6 +2,7 @@ package com.sz.zhihu.fragment.index;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
+import com.sz.zhihu.HomePageActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.adapter.AttentionListAdapter;
 import com.sz.zhihu.adapter.NewInformationAdapter;
@@ -119,7 +121,9 @@ public class CareFragment extends Fragment implements CustomFragmentFunction {
     }
 
     private void userClickListener(User user) {
-
+        Intent intent = new Intent(activity, HomePageActivity.class);
+        intent.putExtra("userId",user.getId());
+        activity.startActivity(intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
