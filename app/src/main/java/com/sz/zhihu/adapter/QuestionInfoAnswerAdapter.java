@@ -162,6 +162,7 @@ public class QuestionInfoAnswerAdapter extends RecyclerView.Adapter {
                 Intent intent = new Intent(context, AnswerActivity.class);
                 intent.putExtra("viewBean", viewBean);
                 context.setResult(AnswerActivity.TO_QUESTION_CODE,intent);
+                context.startActivity(intent);
                 viewBean.save();
                 context.finish();
             });

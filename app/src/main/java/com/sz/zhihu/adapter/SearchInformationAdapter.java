@@ -201,6 +201,8 @@ public class SearchInformationAdapter extends RecyclerView.Adapter {
             userName = view.findViewById(R.id.iihv_username);
             profile = view.findViewById(R.id.iihv_introduction);
             video = view.findViewById(R.id.iihv_video);
+            video.backButton.setVisibility(View.GONE);
+            video.tinyBackImageView.setVisibility(View.GONE);
             content = view.findViewById(R.id.iihv_content);
         }
 
@@ -213,6 +215,7 @@ public class SearchInformationAdapter extends RecyclerView.Adapter {
             userName.setText(information.authorName());
             profile.setText(information.getProfile());
             video.setUp(videoUrl, JCVideoPlayerStandard.SCREEN_LAYOUT_NORMAL);
+            video.startVideo();
         }
     }
 

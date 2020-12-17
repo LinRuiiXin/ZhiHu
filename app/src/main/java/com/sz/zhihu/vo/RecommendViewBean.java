@@ -14,7 +14,7 @@ public class RecommendViewBean extends DataSupport implements Serializable {
     private Long questionId;//问题id，回答有，文章没有
     private Long userId;//用户id
     private int contentType; //1-回答 2.文章
-    private int type;//1-纯文本 2-带图片 3-带视频
+    private int type;//1-纯文本 2-带图片 3-带视频 4-仅视频
     private String title;//标题
     private String username;//用户名
     private String portraitFileName;//用户头像

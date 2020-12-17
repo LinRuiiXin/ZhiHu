@@ -33,12 +33,7 @@ public class SearchResultActivity extends AbstractCustomActivity {
     private TextView search;
     private ViewPager viewPager;
     private PagerSlidingTabStrip pagerHolder;
-    private ComprehensiveFragment comprehensiveFragment;
-    private QuestionFragment questionFragment;
-    private ArticleFragment articleFragment;
-    private UserFragment userFragment;
     private SearchFragment[] fragments;
-    private TextView search1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

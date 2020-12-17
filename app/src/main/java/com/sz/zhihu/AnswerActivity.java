@@ -165,7 +165,7 @@ public class AnswerActivity extends AbstractCustomActivity {
         toolbar = findViewById(answer_tool_bar);
         viewPager = findViewById(R.id.answer_view_pager);
         support = findViewById(R.id.cb_support);
-        collect = findViewById(R.id.cb_collect);
+//        collect = findViewById(R.id.cb_collect);
         comment = findViewById(R.id.cb_comment);
         supportTriangle = findViewById(R.id.cb_support_triangle);
     }
@@ -812,7 +812,10 @@ public class AnswerActivity extends AbstractCustomActivity {
         toolbar.setTitle(viewBean.getTitle());
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
-        toolbar.setOnClickListener(v->toQuestionInfoActivity());
+        toolbar.setOnClickListener(v->{
+            toQuestionInfoActivity();
+            finish();
+        });
         ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayHomeAsUpEnabled(true);
@@ -867,7 +870,7 @@ public class AnswerActivity extends AbstractCustomActivity {
 
     private void buttonControl(boolean b) {
         support.setClickable(b);
-        collect.setClickable(b);
+//        collect.setClickable(b);
         comment.setClickable(b);
     }
 

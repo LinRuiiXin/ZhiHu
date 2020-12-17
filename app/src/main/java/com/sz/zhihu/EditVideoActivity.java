@@ -28,15 +28,22 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.loadmore.LoadMoreView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 import com.sz.zhihu.adapter.EditVideoDialogAdapter;
+import com.sz.zhihu.po.User;
 import com.sz.zhihu.po.VideoMedia;
 import com.sz.zhihu.utils.ArrayUtils;
+import com.sz.zhihu.utils.CallBackUtil;
+import com.sz.zhihu.utils.DBUtils;
+import com.sz.zhihu.utils.GsonUtils;
 import com.sz.zhihu.utils.PermissionUtils;
+import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.view.EditVideoDialogView;
 
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +51,9 @@ import java.util.Map;
 import java.util.Set;
 
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class EditVideoActivity extends AbstractCustomActivity {
@@ -81,6 +91,9 @@ public class EditVideoActivity extends AbstractCustomActivity {
     private JCVideoPlayerStandard video;
     private EditText title;
     private RelativeLayout submitButton;
+    private Gson gson = GsonUtils.getGson();
+    private String serverLocation;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +113,8 @@ public class EditVideoActivity extends AbstractCustomActivity {
             video = findViewById(R.id.aev_video);
             video.backButton.setVisibility(View.GONE);
             video.tinyBackImageView.setVisibility(View.GONE);
+            serverLocation = getString(R.string.server_location);
+            user = DBUtils.queryUserHistory();
             setListeners();
         }catch (NullPointerException e){
             e.printStackTrace();
@@ -110,12 +125,30 @@ public class EditVideoActivity extends AbstractCustomActivity {
         close.setOnClickListener(v->finish());
         getVideo.setOnClickListener(v->dialog.show());
         submitButton.setOnClickListener(v->{
+            submitButton.setClickable(false);
             String titleStr = title.getText().toString();
             if(!TextUtils.isEmpty(titleStr)){
                 if(choiceMedia != null){
                     File file = new File(choiceMedia.getPath());
                     if(file.length() <= 15728640){
-
+                        String url = serverLocation + "/ArticleService/Article/Video";
+                        Map<String,String> params = new HashMap<>(2);
+                        params.put("userId",String.valueOf(user.getUserId()));
+                        params.put("title",titleStr);
+                        RequestUtils.sendFileWithParam(file, url, "video",params, CallBackUtil.commonCallBack(this,
+                                ()->{
+                                    Toast.makeText(EditVideoActivity.this,"请求失败",Toast.LENGTH_SHORT).show();
+                                    submitButton.setClickable(true);
+                                },
+                                simpleDto -> {
+                                    if(simpleDto.isSuccess()){
+                                        Toast.makeText(EditVideoActivity.this,"上传成功",Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }else{
+                                        Toast.makeText(EditVideoActivity.this,simpleDto.getMsg(),Toast.LENGTH_SHORT).show();
+                                    }
+                                    submitButton.setClickable(true);
+                                }));
                     }else{
                         Toast.makeText(EditVideoActivity.this,"视频大小不能超过15MB，请重新选择",Toast.LENGTH_SHORT).show();
                         dialog.show();

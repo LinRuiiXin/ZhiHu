@@ -29,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.sz.zhihu.AnswerActivity;
 import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
+import com.sz.zhihu.VideoActivity;
 import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.security.MessageDigest;
@@ -64,6 +65,7 @@ public class NewInformationAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         RecommendViewBean cardViewBean = data.get(position);
         int type = cardViewBean.getType();
+        type = type == 4 ? 3 : type;
         switch (type) {
             case VIEW_HAS_VIDEO:
                 return VIEW_HAS_VIDEO;
@@ -163,10 +165,10 @@ public class NewInformationAdapter extends RecyclerView.Adapter {
         public void setOnClickListener(RecommendViewBean viewBean) {
             this.view.setOnClickListener(v -> {
                 Intent intent = null;
-                if (viewBean.getContentType() == 1) {
-                    intent = new Intent(context, AnswerActivity.class);
-                } else {
-                    intent = new Intent(context, ArticleActivity.class);
+                if(viewBean.getContentType()==2&&viewBean.getType()==4){
+                    intent = new Intent(context, VideoActivity.class);
+                }else{
+                    intent = new Intent(context,viewBean.getContentType() == 1 ? AnswerActivity.class : ArticleActivity.class);
                 }
                 intent.putExtra("viewBean", viewBean);
                 context.startActivity(intent);

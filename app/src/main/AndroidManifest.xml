@@ -24,7 +24,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EditAccountActivity"></activity>
+        <activity android:name=".VideoActivity"></activity>
+        <activity android:name=".EditAccountActivity" />
         <activity android:name=".SearchResultActivity" />
         <activity android:name=".SearchActivity" />
         <activity android:name=".QuestionInfoActivity" />

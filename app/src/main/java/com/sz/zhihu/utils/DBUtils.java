@@ -146,8 +146,8 @@ public class DBUtils {
         return count;
     }
 
-    public static List<RecommendViewBean> getBrowseRecord(int index) {
-        List<RecommendViewBean> recommendViewBeans = DataSupport.order("id desc").limit(10).offset(index).find(RecommendViewBean.class);
+    public static List<RecommendViewBean> getBrowseRecord(int from,int size) {
+        List<RecommendViewBean> recommendViewBeans = DataSupport.order("id desc").limit(size).offset(from).find(RecommendViewBean.class);
         return recommendViewBeans;
     }
 

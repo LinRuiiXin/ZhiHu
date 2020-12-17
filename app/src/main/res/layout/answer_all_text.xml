@@ -48,6 +48,7 @@
             android:id="@+id/answer_all_text_introduction"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="20dp"
+            android:textSize="10sp"
             />
     </LinearLayout>
     <TextView

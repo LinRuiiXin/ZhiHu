@@ -59,6 +59,7 @@ public class SearchComprehensiveAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         Information information = data.get(position);
         int type = information.getType();
+        type = type == 4 ? 3 : type;
         switch (type) {
             case VIEW_HAS_VIDEO:
                 return VIEW_HAS_VIDEO;
@@ -201,6 +202,8 @@ public class SearchComprehensiveAdapter extends RecyclerView.Adapter {
             userName = view.findViewById(R.id.iihv_username);
             profile = view.findViewById(R.id.iihv_introduction);
             video = view.findViewById(R.id.iihv_video);
+            video.backButton.setVisibility(View.GONE);
+            video.tinyBackImageView.setVisibility(View.GONE);
             content = view.findViewById(R.id.iihv_content);
         }
 
@@ -213,6 +216,7 @@ public class SearchComprehensiveAdapter extends RecyclerView.Adapter {
             userName.setText(information.authorName());
             profile.setText(information.getProfile());
             video.setUp(videoUrl, JCVideoPlayerStandard.SCREEN_LAYOUT_NORMAL);
+            video.startVideo();
         }
     }
 

@@ -64,6 +64,7 @@ public class InformationAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         RecommendViewBean cardViewBean = data.get(position);
         int type = cardViewBean.getType();
+        type = type == 4 ? 3 : type;
         switch (type) {
             case VIEW_HAS_VIDEO:
                 return VIEW_HAS_VIDEO;

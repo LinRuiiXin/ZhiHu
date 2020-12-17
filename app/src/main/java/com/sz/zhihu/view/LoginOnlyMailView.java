@@ -17,6 +17,7 @@ import com.sz.zhihu.dialog.MailLoginDialog;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.interfaces.CustomEditTextListener;
 import com.sz.zhihu.po.User;
+import com.sz.zhihu.utils.GsonUtils;
 import com.sz.zhihu.utils.RequestUtils;
 import com.sz.zhihu.utils.ValidateUtil;
 
@@ -35,7 +36,7 @@ public class LoginOnlyMailView {
                 if(view == null){
                     view = View.inflate(activity, R.layout.dialog_login_only_mail,null);
                     Resources resources = activity.getResources();
-                    Gson gson = new Gson();
+                    Gson gson = GsonUtils.getGson();
                     String serverLocation = resources.getString(R.string.server_location);
                     EditText mail = view.findViewById(R.id.login_om_mail);
                     EditText code = view.findViewById(R.id.login_om_code);

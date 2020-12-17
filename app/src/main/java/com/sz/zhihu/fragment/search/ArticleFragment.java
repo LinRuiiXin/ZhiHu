@@ -22,6 +22,7 @@ import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.sz.zhihu.AnswerActivity;
 import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
+import com.sz.zhihu.VideoActivity;
 import com.sz.zhihu.adapter.SearchInformationAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.po.Keyword;
@@ -65,7 +66,7 @@ public class ArticleFragment extends SearchFragment {
             activity = (Activity) context;
             informationAdapter = new SearchInformationAdapter(activity, data, information -> {
                 RecommendViewBean recommendViewBean = convertInformationToViewBean(information);
-                Intent intent = new Intent(activity,ArticleActivity.class);
+                Intent intent = new Intent(activity,recommendViewBean.getType() == 4 ? VideoActivity.class : ArticleActivity.class);
                 intent.putExtra("viewBean",recommendViewBean);
                 activity.startActivity(intent);
             });
@@ -140,6 +141,7 @@ public class ArticleFragment extends SearchFragment {
                 .contentType(information.contentType())
                 .questionId(information.getQuestionId())
                 .userId(information.getAuthorId())
+                .contentId(information.contentId())
                 .type(information.getType())
                 .title(information.title())
                 .username(information.getAuthorName())

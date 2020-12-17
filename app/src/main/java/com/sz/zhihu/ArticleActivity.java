@@ -77,16 +77,18 @@ public class ArticleActivity extends AbstractCustomActivity {
     private ArticleToken articleToken;
     private ImageView supportTriangle;
     private View dialogView;
+    private View replyView;
+    private View optionView;
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView level1;
     private RecyclerView level2;
     private BottomSheetDialog dialog;
+    private BottomSheetDialog replyDialog;
+    private BottomSheetDialog optionDialog;
     private BottomSheetBehavior<View> behavior;
     private boolean inLevelOne = true;
     private ArticleCommentLevelOneVo lv1ToLv2;
     private User author;
-    private View replyView;
-    private BottomSheetDialog replyDialog;
     private EditText replyEditText;
     private TextView replyTitle;
     private TextView replyObjectName;
@@ -94,16 +96,14 @@ public class ArticleActivity extends AbstractCustomActivity {
     private CommentHolder commentHolder;
     private List<ArticleCommentLevelOneVo> articleCommentLevelOneVos;
     private ArticleCommentLevelOneAdapter commentLevel1Adapter;
+    private ArticleCommentLevelTwoAdapter articleCommentLevelTwoAdapter;
+    List<ArticleCommentLevelTwoVo> commentLevelTwoVos = new ArrayList<>();
     private LinearLayoutManager linearLayoutManager;
     private Long articleId;
-    private View optionView;
     private RelativeLayout optionSupport;
     private RelativeLayout optionReply;
     private RelativeLayout optionDelete;
-    private BottomSheetDialog optionDialog;
-    private ArticleCommentLevelTwoAdapter articleCommentLevelTwoAdapter;
     //初始化二级评论
-    List<ArticleCommentLevelTwoVo> commentLevelTwoVos = new ArrayList<>();
     private int commentLevelTwoLimit = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -131,7 +131,7 @@ public class ArticleActivity extends AbstractCustomActivity {
     * */
     private Consumer<ArticleVo> articleVoCallBack() {
         return articleVo -> {
-            articleToken = new ArticleToken(articleVo.isSupport(),articleVo.isAttention(),recommendViewBean.getSupportSum());
+            articleToken = new ArticleToken(articleVo.isSupport(),articleVo.isAttention(),articleVo.getSupportSum());
             changeSupportButton(articleToken);
             content.loadRichEditorCode(articleVo.getContent());
             buttonControl(true);
@@ -163,7 +163,7 @@ public class ArticleActivity extends AbstractCustomActivity {
     private void bindComponent() {
         content = findViewById(R.id.aa_content);
         support = findViewById(R.id.cb_support);
-        collect = findViewById(R.id.cb_collect);
+//        collect = findViewById(R.id.cb_collect);
         comment = findViewById(R.id.cb_comment);
         supportTriangle = findViewById(R.id.cb_support_triangle);
         buttonControl(false);
@@ -724,8 +724,8 @@ public class ArticleActivity extends AbstractCustomActivity {
 
     private void buttonControl(boolean b) {
         support.setClickable(b);
-        collect.setClickable(b);
-//        comment.setClickable(b);
+//        collect.setClickable(b);
+        comment.setClickable(b);
     }
 
     private void showLevelOne() {

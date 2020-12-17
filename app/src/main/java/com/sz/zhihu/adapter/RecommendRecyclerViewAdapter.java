@@ -33,6 +33,7 @@ import com.sz.zhihu.AnswerActivity;
 import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
 import com.sz.zhihu.SplashActivity;
+import com.sz.zhihu.VideoActivity;
 import com.sz.zhihu.vo.RecommendViewBean;
 
 import java.security.MessageDigest;
@@ -130,6 +131,7 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
                 Glide.with(context).load(serverLocation + "/res/User/" + cardViewBean.getUserId() + "/" + cardViewBean.getPortraitFileName()).into(viewHolder.portrait);
                 viewHolder.username.setText(cardViewBean.getUsername());
                 viewHolder.video.setUp(serverLocation + "/res/Video/" + cardViewBean.getThumbnail(), JCVideoPlayerStandard.SCREEN_LAYOUT_NORMAL);
+                viewHolder.video.startVideo();
 //                viewHolder.video.thumbImageView.setImage("http://p.qpic.cn/videoyun/0/2449_43b6f696980311e59ed467f22794e792_1/640");
                 viewHolder.introduction.setText(cardViewBean.getIntroduction());
                 viewHolder.content.setText(cardViewBean.getContent());
@@ -167,10 +169,10 @@ public class RecommendRecyclerViewAdapter extends RecyclerView.Adapter {
         public void setOnClickListener(RecommendViewBean viewBean) {
             this.view.setOnClickListener(v -> {
                 Intent intent = null;
-                if (viewBean.getContentType() == 1) {
-                    intent = new Intent(context, AnswerActivity.class);
+                if (viewBean.getContentType() == 2 && viewBean.getType() == 4) {
+                    intent = new Intent(context, VideoActivity.class);
                 } else {
-                    intent = new Intent(context, ArticleActivity.class);
+                    intent = new Intent(context, viewBean.getContentType() == 1 ? AnswerActivity.class : ArticleActivity.class);
                 }
                 intent.putExtra("viewBean", viewBean);
                 context.startActivity(intent);

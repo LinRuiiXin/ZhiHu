@@ -23,6 +23,7 @@ import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.sz.zhihu.AnswerActivity;
 import com.sz.zhihu.ArticleActivity;
 import com.sz.zhihu.R;
+import com.sz.zhihu.VideoActivity;
 import com.sz.zhihu.adapter.SearchComprehensiveAdapter;
 import com.sz.zhihu.dto.SimpleDto;
 import com.sz.zhihu.po.Keyword;
@@ -66,7 +67,11 @@ public class ComprehensiveFragment extends SearchFragment {
             activity = (Activity) context;
             searchComprehensiveAdapter = new SearchComprehensiveAdapter(activity, data,information -> {
                 RecommendViewBean recommendViewBean = convertInformationToViewBean(information);
-                Intent intent = new Intent(activity, information.getContentType() == 1 ? AnswerActivity.class : ArticleActivity.class);
+                Intent intent = null;
+                if(recommendViewBean.getContentType() == 2 && recommendViewBean.getType() == 4){
+                    intent = new Intent(activity, VideoActivity.class);
+                }else
+                    intent = new Intent(activity, information.getContentType() == 1 ? AnswerActivity.class : ArticleActivity.class);
                 intent.putExtra("viewBean",recommendViewBean);
                 activity.startActivity(intent);
             });
@@ -148,6 +153,8 @@ public class ComprehensiveFragment extends SearchFragment {
                 .username(information.getAuthorName())
                 .portraitFileName(information.getPortraitFileName())
                 .introduction(information.getProfile())
+                .thumbnail(information.thumbnail())
+                .contentId(information.contentId())
                 .content(information.content());
 
     }

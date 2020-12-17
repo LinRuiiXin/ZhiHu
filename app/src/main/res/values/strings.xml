@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">ZhiHu</string>
-    <!--        <string name="server_location">http://192.168.0.107:8080</string>-->
-    <string name="server_location">http://172.20.10.7:8080</string>
+<!--    <string name="server_location">http://172.18.65.184:8080</string>-->
+        <string name="server_location">http://172.20.10.7:8080</string>
     <string name="answer_behavior">com.sz.zhihu.behavior.AnswerBehavior</string>
 </resources>
-
